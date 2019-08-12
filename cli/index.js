@@ -60,7 +60,9 @@ function buildHtmlAndJson({ filePath, output, buildHtml }) {
   };
 
   // A temporary fix for the mdn_url values in the related_content.
-  fixRelatedContentURIs(options.document);
+  if (!options.document.legacy) {
+    fixRelatedContentURIs(options.document);
+  }
 
   const uri = mapToURI(options.document);
 

@@ -71,10 +71,18 @@ export class Document extends React.Component {
         <h1 className="page-title">{document.title}</h1>
         <div className="main">
           <div className="sidebar">
-            <RenderSideBar document={document} />
+            {document.legacy ? (
+              <RenderLegacySideBar document={document} />
+            ) : (
+              <RenderSideBar document={document} />
+            )}
           </div>
           <div className="content">
-            <RenderHTMLElementDocument document={document} />
+            {document.legacy ? (
+              <RenderLegacyDocument document={document} />
+            ) : (
+              <RenderHTMLElementDocument document={document} />
+            )}
             <hr />
             {document.contributors && (
               <Contributors contributors={document.contributors} />
@@ -84,6 +92,10 @@ export class Document extends React.Component {
       </div>
     );
   }
+}
+
+function RenderLegacySideBar({ document }) {
+  return <div dangerouslySetInnerHTML={{ __html: document.related_content }} />;
 }
 
 function RenderSideBar({ document }) {
@@ -243,4 +255,8 @@ function LoadingError({ error }) {
       )}
     </div>
   );
+}
+
+function RenderLegacyDocument({ document }) {
+  return <div dangerouslySetInnerHTML={{ __html: document.body }} />;
 }
