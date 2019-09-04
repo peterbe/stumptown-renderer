@@ -63,8 +63,18 @@ export class Document extends React.Component {
     if (loadingError) {
       return <LoadingError error={loadingError} />;
     }
+    console.log("RENDER document keys:", Object.keys(document));
     if (!document) {
       return null;
+    }
+
+    // If the `document` prop is an empty object, it's the App telling us
+    // the document has already been rendered on the server. By rendering
+    // an empty string with `dangerouslySetInnerHTML` we're hinting to
+    // React not to try to re-render this node.
+    // See https://github.com/facebook/react/issues/10923#issuecomment-338715787
+    if (!Object.keys(document).length) {
+      return <div dangerouslySetInnerHTML={{ __html: "" }} />;
     }
     return (
       <div>
@@ -123,7 +133,14 @@ function SidebarLeaf({ depth, title, content }) {
           } else {
             return (
               <li key={node.uri}>
-                <Link to={node.uri}>{node.title}</Link>
+                <Link
+                  to={node.uri}
+                  onClick={event => {
+                    console.log(`CLICKED ON ${node.uri}`);
+                  }}
+                >
+                  {node.title}
+                </Link>
               </li>
             );
           }

@@ -38,13 +38,13 @@ export default (renderApp, options) => {
     // Use the document's title instead
     pageTitle = document.title;
 
-    // XXX We *could* just expose some absolute minimal here. Just enough
-    // for the React Document component to know it doesn't need to re-render.
-    const escapeDocumentJson = JSON.stringify(document).replace("</", "<\\/");
-    const documentDataTag = `
-    <script id="documentdata" type="application/json">${escapeDocumentJson}</script>
-    `.trim();
-    $("#root").after(documentDataTag);
+    // // XXX We *could* just expose some absolute minimal here. Just enough
+    // // for the React Document component to know it doesn't need to re-render.
+    // const escapeDocumentJson = JSON.stringify(document).replace("</", "<\\/");
+    // const documentDataTag = `
+    // <script id="documentdata" type="application/json">${escapeDocumentJson}</script>
+    // `.trim();
+    // $("#root").after(documentDataTag);
   }
 
   $("title").text(pageTitle);

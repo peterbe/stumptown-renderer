@@ -6,15 +6,20 @@ import { App } from "./app";
 // import * as serviceWorker from './serviceWorker';
 
 const container = document.getElementById("root");
-let documentData = null;
-const documentDataElement = document.getElementById("documentdata");
-if (documentDataElement) {
-  documentData = JSON.parse(documentDataElement.text);
-}
+
+// If the `<div id="root">` was filled with stuff, it means the page was
+// rendered on the server. That's a chance to "send a message" to the
+// Document component (called from the App component depending on the URL)
+// that the page is rendered fine and it doesn't need to re-render
+// client-side.
+let documentData = container.firstChild ? {} : null;
+
 const app = <App document={documentData} />;
 if (container.firstElementChild) {
+  console.log("HYDRATE!");
   ReactDOM.hydrate(app, container);
 } else {
+  console.log("RENDER!");
   ReactDOM.render(app, container);
 }
 
