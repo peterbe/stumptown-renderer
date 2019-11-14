@@ -142,14 +142,24 @@ export class SearchWidget extends React.Component {
       encode: "advanced",
       suggest: true,
       // tokenize: "reverse",
-      tokenize: "forward"
+      tokenize: "forward",
+      doc: {
+        id: "uri",
+        field: "title"
+      }
     });
     this._map = titles;
-    Object.entries(titles).forEach(([uri, title]) => {
-      // XXX investigate if it's faster to add all at once
-      // https://github.com/nextapps-de/flexsearch/#addupdateremove-documents-tofrom-the-index
-      this.index.add(uri, title);
-    });
+
+    this.index.add(
+      Object.entries(this._map).map(([uri, info]) => {
+        return { uri, title: info.title, popularity: info.popularity };
+      })
+    );
+    // Object.entries(titles).forEach(([uri, info]) => {
+    //   // XXX investigate if it's faster to add all at once
+    //   // https://github.com/nextapps-de/flexsearch/#addupdateremove-documents-tofrom-the-index
+    //   this.index.add(uri, info);
+    // });
     this.fuzzySearcher = new FuzzySearch(Object.keys(this._map));
   };
 
@@ -219,7 +229,7 @@ export class SearchWidget extends React.Component {
           });
           const results = fuzzyResults.map(fuzzyResult => {
             return {
-              title: this._map[fuzzyResult.needle],
+              title: this._map[fuzzyResult.needle].title,
               uri: fuzzyResult.needle,
               substrings: fuzzyResult.substrings
             };
@@ -233,14 +243,24 @@ export class SearchWidget extends React.Component {
         }
       } else {
         // Full-Text search
-        const indexResults = this.index.search(q, {
+        const indexResults = this.index.search({
+          query: q,
+          field: "title",
           limit: isMobileUserAgent() ? 5 : 10,
+          // sort: "popularity",
+          sort: (a, b) => b.popularity - a.popularity,
           // bool: "or",
           suggest: true // This can give terrible result suggestions
         });
 
-        const results = indexResults.map(uri => {
-          return { title: this._map[uri], uri };
+        const results = indexResults.map(result => {
+          return {
+            title: this._map[result.uri].title,
+            uri: result.uri,
+
+            // temporary
+            popularity: this._map[result.uri].popularity
+          };
         });
         this.setState({
           highlitResult: results.length ? 0 : null,
@@ -488,6 +508,7 @@ class ShowSearchResults extends React.PureComponent {
                 this.redirectHandler(result);
               }}
             >
+              <small style={{ color: "red" }}>{result.popularity}</small>
               <HighlightMatch title={result.title} q={q} />
               <br />
               <BreadcrumbURI uri={result.uri} substrings={result.substrings} />
