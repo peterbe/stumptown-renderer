@@ -183,7 +183,7 @@ async function runBuild(sources, options, logger) {
     if (!options.watch) {
       builder.initSelfHash();
       builder.ensureAllTitles();
-      builder.ensureAllChildren();
+
       builder.prepareRoots();
       return builder.start();
     }
@@ -287,7 +287,9 @@ class Builder {
 
   *walkSources({ allLocales = false } = {}) {
     for (const source of this.sources.entries()) {
-      for (const localeFolder of this.getLocaleRootFolders(source, {allLocales})) {
+      for (const localeFolder of this.getLocaleRootFolders(source, {
+        allLocales
+      })) {
         for (const [folder, files] of walker(localeFolder)) {
           yield { source, localeFolder, folder, files };
         }
@@ -399,12 +401,7 @@ class Builder {
     const t0 = new Date();
     let folderProcessingPromises = [];
 
-    for (const {
-      source,
-      localeFolder,
-      folder,
-      files
-    } of self.walkSources()) {
+    for (const { source, localeFolder, folder, files } of self.walkSources()) {
       if (self.excludeFolder(source, folder, localeFolder, files)) {
         // If the folder was a Stumptown folder, what we're
         // actually excluding is all the .json files in the folder.
@@ -442,9 +439,7 @@ class Builder {
           self.tickProgressbar(++total);
         }
       } else {
-        folderProcessingPromises.push(
-          processAndTrackFolder(source, folder)
-        );
+        folderProcessingPromises.push(processAndTrackFolder(source, folder));
       }
     }
     await Promise.all(folderProcessingPromises);
@@ -482,7 +477,9 @@ class Builder {
       this.ensurePopularities();
       this.logger.info("Building a list of ALL titles and URIs...");
       let t0 = new Date();
-      for (const { source, folder, files } of this.walkSources({allLocales: true})) {
+      for (const { source, folder, files } of this.walkSources({
+        allLocales: true
+      })) {
         if (source.isStumptown) {
           for (const filename of files.filter(n => n.endsWith(".json"))) {
             const filepath = path.join(folder, filename);
@@ -506,9 +503,11 @@ class Builder {
         )
       );
     }
+
+    this.ensureAllTranslations();
   }
 
-  ensureAllChildren() {
+  ensureAllTranslations() {
     this.ensureAllTitles();
     for (const [uri, data] of Object.entries(this.allTitles)) {
       if (data.translation_of) {
@@ -524,7 +523,9 @@ class Builder {
             title: data.title
           });
         } else {
-          this.logger.error(`${uri} is a translation of ${parentURL}, which is missing!`);
+          this.logger.error(
+            `${uri} is a translation of ${parentURL}, which is missing!`
+          );
         }
       }
     }
@@ -1029,7 +1030,7 @@ class Builder {
 
     const englishSlug = metadata.translation_of || metadata.slug;
     const englishURL = buildMDNUrl("en-US", englishSlug);
-    
+
     if (this.allTitles.hasOwnProperty(englishURL)) {
       let otherTranslations = this.allTitles[englishURL].translations || [];
       if (otherTranslations.length) {
