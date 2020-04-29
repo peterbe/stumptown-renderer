@@ -244,6 +244,10 @@ class Builder {
     this.allTitles = new Map();
     this.allRedirects = new Map();
 
+    // This one gets filled lazily by taking the keys and values
+    // from this.allTitles and reversing it.
+    this.mdnUrlByFolder = new Map();
+
     this.options.locales = cleanLocales(this.options.locales || []);
     this.options.notLocales = cleanLocales(this.options.notLocales || []);
 
@@ -438,6 +442,16 @@ class Builder {
 
       this.summorizeResults(counts, t1 - t0);
     }
+  }
+
+  getMetadataByFolder(folder) {
+    if (!this.mdnUrlByFolder.size) {
+      this.ensureAllTitles();
+      for (const [key, data] of this.allTitles) {
+        this.mdnUrlByFolder.set(data.file, key);
+      }
+    }
+    return this.allTitles.get(this.mdnUrlByFolder.get(folder));
   }
 
   ensureAllTitles() {
@@ -994,29 +1008,38 @@ class Builder {
 
     const hasher = crypto.createHash("md5");
 
-    const metadataRaw = fs.readFileSync(path.join(folder, "index.yaml"));
+    const metadata = this.getMetadataByFolder(folder);
 
-    const metadata = yaml.safeLoad(metadataRaw);
+    // const metadataRaw = fs.readFileSync(path.join(folder, "index.yaml"));
+
+    // const metadata = yaml.safeLoad(metadataRaw);
+    // console.log(metadata);
+    // console.log(metadata2);
+    // console.log("MATCHING?!");
+
+    // throw new Error("STOP!");
+
     if (this.excludeSlug(metadata)) {
       return { result: processing.EXCLUDED, file: folder };
     }
-    hasher.update(metadataRaw);
+    // hasher.update(metadataRaw);
 
-    if (fs.existsSync(path.join(folder, "wikihistory.yaml"))) {
-      const wikiMetadataRaw = fs.readFileSync(
-        path.join(folder, "wikihistory.yaml")
-      );
-      const wikiMetadata = yaml.safeLoad(wikiMetadataRaw);
-      metadata.modified = wikiMetadata.modified;
-    }
+    // if (fs.existsSync(path.join(folder, "wikihistory.yaml"))) {
+    //   const wikiMetadataRaw = fs.readFileSync(
+    //     path.join(folder, "wikihistory.yaml")
+    //   );
+    //   const wikiMetadata = yaml.safeLoad(wikiMetadataRaw);
+    //   metadata.modified = wikiMetadata.modified;
+    // }
 
-    metadata.locale = extractLocale(source, folder);
+    // metadata.locale = extractLocale(source, folder);
 
     // The destination is the same as source but with a different base.
     // If the file *came from* /path/to/files/en-US/foo/bar/
     // the final destination is /path/to/build/en-US/foo/bar/index.json
 
-    const mdn_url = buildMDNUrl(metadata.locale, metadata.slug);
+    // const mdn_url = buildMDNUrl(metadata.locale, metadata.slug);
+    const { mdn_url } = metadata;
 
     const destinationDirRaw = path.join(
       this.destination,
@@ -1294,6 +1317,8 @@ class Builder {
       file: folder,
       modified: metadata.modified,
       translation_of: metadata.translation_of,
+      summary: metadata.summary,
+      tags: metadata.tags,
       // XXX To be lean if either of these are false, perhaps not
       // bother setting it.
       excludeInTitlesJson: source.excludeInTitlesJson,
