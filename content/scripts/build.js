@@ -638,14 +638,15 @@ class Builder {
     self.summarizeResults(counts, flawCounts, t1 - t0);
   }
 
-  ensureAllTitles() {
+  ensureAllTitles(forceRegenerate = false) {
     if (!this.selfHash) {
       throw new Error("this.selfHash hasn't been set yet");
     }
     if (
       this.allTitles.size &&
       this.allTitles.get("_hash") === this.selfHash &&
-      !this.options.regenerateAllTitles
+      !this.options.regenerateAllTitles &&
+      !forceRegenerate
     ) {
       // No reason to proceed, the titles have already been loaded into memory.
       return;
@@ -876,6 +877,9 @@ class Builder {
         watcher.on("change", (path) => {
           onChange(path, source);
         });
+        // watcher.on("add", (path) => {
+        //   console.log("NEW PATH ADDED", path);
+        // });
         watcher.on("ready", () => {
           const watchedPaths = watcher.getWatched();
           const folders = Object.values(watchedPaths);
@@ -1450,6 +1454,14 @@ class Builder {
     );
     const mdn_url = buildMDNUrl(metadata.locale, metadata.slug);
     const mdnUrlLC = mdn_url.toLowerCase();
+    if (!this.allTitles.has(mdnUrlLC)) {
+      // This means the this.allTitles is out of date
+      // This can happen if you've added a new document and made
+      // the first ever edit on it.
+      // For example, if you edit a document's front-matter to change
+      // the slug. Then it's a new mdnUrl since the watcher started.
+      this.ensureAllTitles(true);
+    }
 
     if (this.excludeSlug(mdn_url)) {
       return { result: processing.EXCLUDED, file: folder };
@@ -1794,7 +1806,14 @@ class Builder {
    */
   processFolderTitle(source, folder, allPopularities) {
     const { metadata } = Document.read(source.filepath, folder, true);
-    const mdn_url = buildMDNUrl(metadata.locale, metadata.slug);
+    let mdn_url;
+    try {
+      mdn_url = buildMDNUrl(metadata.locale, metadata.slug);
+    } catch (err) {
+      console.warn(`The folder that caused the error was: ${folder}`);
+      throw err;
+    }
+
     const mdnUrlLC = mdn_url.toLowerCase();
 
     if (this.allTitles.has(mdnUrlLC)) {

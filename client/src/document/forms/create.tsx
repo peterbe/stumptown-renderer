@@ -7,9 +7,13 @@ export default function DocumentCreate() {
   const navigate = useNavigate();
   const [savingError, setSavingError] = useState<Error | null>(null);
 
+  useEffect(() => {
+    document.title = "Create document";
+  }, []);
+
   async function handleCreate(data: DocumentData) {
     try {
-      const response = await fetch(`/_document`, {
+      const response = await fetch("/_document", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ locale, ...data }),
