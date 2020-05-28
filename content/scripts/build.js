@@ -878,9 +878,6 @@ class Builder {
         watcher.on("change", (path) => {
           onChange(path, source);
         });
-        // watcher.on("add", (path) => {
-        //   console.log("NEW PATH ADDED", path);
-        // });
         watcher.on("ready", () => {
           const watchedPaths = watcher.getWatched();
           const folders = Object.values(watchedPaths);
