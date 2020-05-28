@@ -659,7 +659,8 @@ class Builder {
     // But first, see if we can use the title from the last build.
     if (
       fs.existsSync(ALL_TITLES_JSON_FILEPATH) &&
-      !this.options.regenerateAllTitles
+      !this.options.regenerateAllTitles &&
+      !forceRegenerate
     ) {
       this.allTitles = new Map(
         Object.entries(
