@@ -333,6 +333,47 @@ function Macros({ messages }: { messages: MacroErrorMessage[] }) {
     setOpening(key);
     fetch(`/_open?${sp.toString()}`);
   }
+
+  useEffect(() => {
+    const typesById = new Map(
+      messages
+        .filter((msg) => msg.id)
+        .map((msg) => {
+          // Turn it into a string because, as as dataset attribute it's
+          // actually always a string
+          return [`${msg.id}`, msg];
+        })
+    );
+    console.log(typesById);
+
+    const annotations: RoughAnnotation[] = [];
+    for (const anchor of [
+      ...document.querySelectorAll<HTMLAnchorElement>(
+        "div.content a[data-flaw-id]"
+      ),
+    ]) {
+      if (anchor.dataset.flawId && typesById.has(anchor.dataset.flawId)) {
+        const msg: MacroErrorMessage = typesById.get(anchor.dataset.flawId);
+        const annotationColor =
+          msg.name === "MacroRedirectedLinkError" ? "pink" : "red";
+        // anchor.dataset.originalTitle = anchor.title;
+        annotations.push(
+          annotate(anchor, {
+            type: "box",
+            color: annotationColor,
+            animationDuration: 300,
+          })
+        );
+      }
+    }
+
+    const ag = annotationGroup(annotations);
+    ag.show();
+
+    return () => {
+      ag.hide();
+    };
+  }, [messages]);
   return (
     <div className="flaw flaw__macros">
       <h3>{humanizeFlawName("macros")}</h3>

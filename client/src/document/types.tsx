@@ -41,4 +41,5 @@ export interface MacroErrorMessage {
   filepath: string;
   sourceContext: string;
   macroName: string;
+  id?: number;
 }
