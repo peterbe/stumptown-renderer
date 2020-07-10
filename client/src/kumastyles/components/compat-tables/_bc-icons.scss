@@ -26,44 +26,44 @@
 
   .bc-head-icon-chrome:before,
   .bc-head-icon-chrome_android:before {
-    @include set-icon("../icons/browsers/chrome.svg", 20px, 24px);
+    @include set-icon("./icons/browsers/chrome.svg", 20px, 24px);
   }
 
   .bc-head-icon-edge:before,
   .bc-head-icon-edge_mobile:before {
-    @include set-icon("../icons/browsers/edge.svg", 20px, 24px);
+    @include set-icon("./icons/browsers/edge.svg", 20px, 24px);
   }
 
   .bc-head-icon-firefox:before,
   .bc-head-icon-firefox_android:before {
-    @include set-icon("../icons/browsers/firefox.svg", 20px, 24px);
+    @include set-icon("./icons/browsers/firefox.svg", 20px, 24px);
   }
 
   .bc-head-icon-ie:before {
-    @include set-icon("../icons/browsers/internet-explorer.svg", 20px, 24px);
+    @include set-icon("./icons/browsers/internet-explorer.svg", 20px, 24px);
   }
 
   .bc-head-icon-nodejs:before {
-    @include set-icon("../icons/platforms/nodejs.svg", 20px, 24px);
+    @include set-icon("./icons/platforms/nodejs.svg", 20px, 24px);
   }
 
   .bc-head-icon-opera:before,
   .bc-head-icon-opera_android:before {
-    @include set-icon("../icons/browsers/opera.svg", 20px, 24px);
+    @include set-icon("./icons/browsers/opera.svg", 20px, 24px);
   }
 
   .bc-head-icon-safari:before,
   .bc-head-icon-safari_ios:before {
-    @include set-icon("../icons/browsers/safari.svg", 20px, 24px);
+    @include set-icon("./icons/browsers/safari.svg", 20px, 24px);
   }
 
   .bc-head-icon-webview_android:before {
-    @include set-icon("../icons/platforms/android.svg", 18px, 22px);
+    @include set-icon("./icons/platforms/android.svg", 18px, 22px);
     left: -23px;
   }
 
   .bc-head-icon-samsunginternet_android:before {
-    @include set-icon("../icons/browsers/samsung-internet.svg", 20px, 24px);
+    @include set-icon("./icons/browsers/samsung-internet.svg", 20px, 24px);
   }
 }
 
@@ -83,18 +83,18 @@
   }
 
   .bc-platform-desktop:before {
-    @include set-icon("../icons/platforms/desktop.svg", 24px, 24px);
+    @include set-icon("./icons/platforms/desktop.svg", 24px, 24px);
   }
 
   /* mobile icon is vertical, therefore needs
        different width, height and margin values */
   .bc-platform-mobile:before {
-    @include set-icon("../icons/platforms/mobile.svg", 16px, 32px);
+    @include set-icon("./icons/platforms/mobile.svg", 16px, 32px);
     margin-top: 0;
   }
 
   .bc-platform-server:before {
-    @include set-icon("../icons/platforms/server.svg", 24px, 24px);
+    @include set-icon("./icons/platforms/server.svg", 24px, 24px);
   }
 }
 
@@ -103,15 +103,11 @@ Icons denooting complicatons with support (footnote, altname, prefix, etc)
 ********************************************************************** */
 
 .ic-altname:before {
-  @include set-icon(
-    "../icons/browser-compat-general/alternate.svg",
-    12px,
-    22px
-  );
+  @include set-icon("./icons/browser-compat-general/alternate.svg", 12px, 22px);
 }
 
 .ic-footnote:before {
-  @include set-icon("../icons/browser-compat-general/asterisk.svg", 10px, 10px);
+  @include set-icon("./icons/browser-compat-general/asterisk.svg", 10px, 10px);
 }
 
 .ic-prefix:before {
@@ -123,23 +119,23 @@ Icons denooting complicatons with support (footnote, altname, prefix, etc)
 }
 
 .ic-disabled:before {
-  @include set-icon("../icons/general/flag.svg", 24px, 24px);
+  @include set-icon("./icons/general/flag.svg", 24px, 24px);
 }
 
 .ic-non-standard:before {
-  @include set-icon("../icons/notifications/exclamation-triangle.svg");
+  @include set-icon("./icons/notifications/exclamation-triangle.svg");
 }
 
 .ic-experimental:before {
-  @include set-icon("../../icons/general/flask.svg");
+  // @include set-icon("./icons/general/flask.svg");
 }
 
 .ic-history:before {
-  @include set-icon("../icons/arrows/caret-down.svg", 9px, 13px);
+  @include set-icon("./icons/arrows/caret-down.svg", 9px, 13px);
 }
 
 .ic-deprecated:before {
-  @include set-icon("../icons/emojis/thumbs-down.svg");
+  @include set-icon("./icons/emojis/thumbs-down.svg");
 }
 
 /* some flex alignment for icons inside the legend */

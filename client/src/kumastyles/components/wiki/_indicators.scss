@@ -264,7 +264,7 @@ icons for both types of indicators
 
 .experimental,
 .experimentalBadge {
-  @include indicator-svg-icon("../../icons/general/flask.svg");
+  @include indicator-svg-icon("../icons/general/flask.svg");
 }
 
 .inlineIndicator.experimental,
@@ -281,25 +281,25 @@ icons for both types of indicators
 }
 
 .deprecated {
-  @include indicator-svg-icon("../icons/emojis/thumbs-down.svg");
+  @include indicator-svg-icon("../../icons/emojis/thumbs-down.svg");
 }
 
 .inlineIndicator.deprecated {
   @extend %indicator-with-icon;
 
   &:before {
-    @include set-inline-icon("../icons/emojis/thumbs-down.svg");
+    @include set-inline-icon("../../icons/emojis/thumbs-down.svg");
   }
 }
 
 .draft,
 .warning.warning-review,
 .translationInProgress {
-  @include indicator-svg-icon("../../icons/tools/pencil.svg");
+  @include indicator-svg-icon("../icons/tools/pencil.svg");
 }
 
 .note {
-  @include indicator-svg-icon("../../icons/file-icons/file.svg");
+  @include indicator-svg-icon("../icons/file-icons/file.svg");
 
   &:before {
     @include vendorize(transform, scaleY(-1) scaleX(1));
@@ -307,13 +307,13 @@ icons for both types of indicators
 }
 
 .obsolete {
-  @include indicator-svg-icon("../../icons/general/trash.svg");
+  @include indicator-svg-icon("../icons/general/trash.svg");
 }
 
 .nonStandard,
 .nonstandardBadge {
   @include indicator-svg-icon(
-    "../../icons/notifications/exclamation-triangle.svg"
+    "../icons/notifications/exclamation-triangle.svg"
   );
 }
 
@@ -322,17 +322,19 @@ icons for both types of indicators
   @extend %indicator-with-icon;
 
   &:before {
-    // @include set-inline-icon('../../icons/notifications/exclamation-triangle.svg'); TEMP
+    @include set-inline-icon(
+      "../../icons/notifications/exclamation-triangle.svg"
+    );
   }
 }
 
 .privilegedBadge,
 .install {
-  @include indicator-svg-icon("../../icons/general/shield.svg");
+  @include indicator-svg-icon("../icons/general/shield.svg");
 }
 
 .secureContexts {
-  @include indicator-svg-icon("../../icons/general/lock.svg");
+  @include indicator-svg-icon("../icons/general/lock.svg");
 }
 
 /* when used in inline indicator boxes */

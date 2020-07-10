@@ -132,7 +132,6 @@ Styling for block level icons
 ====================================================================== */
 @mixin set-icon($icon, $background-size: 16px, $height: 20px) {
   @extend %icon-base;
-  @debug "THE ICON IS: #{$icon}";
   background-image: url($icon);
   background-size: $background-size;
   width: $background-size;
@@ -144,7 +143,6 @@ Styling for inline icons
 ====================================================================== */
 @mixin set-inline-icon($icon, $background-size: 16px, $height: 20px) {
   @extend %icon-base;
-  @debug "THE INLINE ICON IS: #{$icon}";
   background-image: url($icon);
   background-size: $background-size;
   margin: 0 5px 0 -20px;

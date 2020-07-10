@@ -119,7 +119,7 @@ i.icon-thumbs-down-alt {
 
 /* icon classes used by ExperimentalBadge and the HTMLRefTable macros */
 i.icon-beaker {
-  @include set-icon("../icons/general/flask.svg");
+  // @include set-icon('../icons/general/flask.svg');
   vertical-align: text-bottom;
 }
 
