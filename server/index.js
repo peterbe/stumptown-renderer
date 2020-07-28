@@ -8,7 +8,7 @@ const { buildDocumentFromURL, buildLiveSamplePageFromURL } = require("build");
 const { CONTENT_ROOT, Redirect } = require("content");
 const { prepareDoc, renderHTML } = require("ssr");
 
-const { STATIC_ROOT } = require("./constants");
+const { DISABLE_CATCHALL, STATIC_ROOT } = require("./constants");
 const documentRouter = require("./document");
 const { searchRoute } = require("./document-watch");
 const flawsRoute = require("./flaws");
@@ -86,6 +86,10 @@ app.use("/:locale/search-index.json", searchRoute);
 app.get("/_flaws", flawsRoute);
 
 app.get("/*", async (req, res) => {
+  if (DISABLE_CATCHALL) {
+    return res.status(406).send("Catchall is disabled");
+  }
+
   if (req.url.startsWith("_")) {
     // URLs starting with _ is exclusively for the meta-work and if there
     // isn't already a handler, it's something wrong.
