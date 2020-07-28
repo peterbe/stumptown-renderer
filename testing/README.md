@@ -156,3 +156,16 @@ put this in anywhere:
 ```javascript
 console.log(await page.content());
 ```
+
+## Headless tests should only test static server
+
+In CI, the environment variable `SERVER_DISABLE_CATCHALL=true` is set so that
+if a URL to `http://localhost:5000/*` doesn't match a file on disk, it should
+not attempt to build it on-the-fly. That ability to build on-the-fly is
+only for when you run the full development environment.
+
+**All headless tests should assume all static files from the server.**
+
+That's because our `server` is being used for two difference purposes.
+One, for the local development as a proxy for `http://localhost:3000` and
+one for running functional (headless) tests.
