@@ -87,6 +87,9 @@ app.get("/_flaws", flawsRoute);
 
 app.get("/*", async (req, res) => {
   if (DISABLE_CATCHALL) {
+    console.warn(
+      `Catchall is disabled and request for ${req.url} not satisfied`
+    );
     return res.status(406).send("Catchall is disabled");
   }
 
