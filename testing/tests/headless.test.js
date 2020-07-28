@@ -24,7 +24,6 @@ describe("Basic viewing of functional pages", () => {
       // interested in waiting for.
       waitUntil: "domcontentloaded",
     });
-    console.log(await page.content());
     await expect(page).toMatch("<foo>: A test tag");
   });
 
