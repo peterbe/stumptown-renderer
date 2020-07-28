@@ -12,37 +12,17 @@ const { DISABLE_CATCHALL, STATIC_ROOT } = require("./constants");
 const documentRouter = require("./document");
 const { searchRoute } = require("./document-watch");
 const flawsRoute = require("./flaws");
+const { staticMiddleware } = require("./middlewares");
 
 const app = express();
 app.use(express.json());
 
-// Lowercase every request because every possible file we might have
-// on disk is always in lowercase.
-// This only helps when you're on a filesystem (e.g. Linux) that is case
-// sensitive.
-app.use((req, res, next) => {
-  req.url = req.url.toLowerCase();
-
-  if (req.url.includes("/_samples_/")) {
-    // We need to convert incoming live-sample URL's like:
-    //   /en-us/docs/web/css/:indeterminate/_samples_/progress_bar
-    // to:
-    //   /en-us/docs/web/css/_colon_indeterminate/_samples_/progress_bar
-    // since they should be served directly by the static middleware.
-    req.url = slugToFoldername(req.url);
-  }
-  next();
-});
+app.use(staticMiddleware);
 
 app.use(express.static(STATIC_ROOT));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Used for headless test sanity checking
-app.get("/_ping", (req, res) => {
-  res.send("pong");
-});
 
 app.use("/_document", documentRouter);
 
