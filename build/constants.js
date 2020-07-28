@@ -4,6 +4,9 @@ require("dotenv").config({
   path: path.join(__dirname, "..", process.env.ENV_FILE || ".env"),
 });
 
+const BUILD_OUT_ROOT =
+  process.env.BUILD_OUT_ROOT || path.join(__dirname, "..", "client", "build");
+
 const FLAW_LEVELS = Object.freeze({
   ERROR: "error",
   IGNORE: "ignore",
@@ -43,6 +46,7 @@ const FIX_FLAWS_VERBOSE = JSON.parse(
 );
 
 module.exports = {
+  BUILD_OUT_ROOT,
   DEFAULT_FLAW_LEVELS,
   FILES,
   FLAW_LEVELS,

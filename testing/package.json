@@ -9,10 +9,11 @@
   },
   "dependencies": {
     "cheerio": "1.0.0-rc.3",
+    "fs-extra": "9.0.1",
     "jest": "26.0.1",
     "jest-puppeteer": "4.4.0",
     "puppeteer": "2",
-    "simple-git": "2.15.0"
+    "tempy": "0.6.0"
   },
   "jest": {
     "preset": "jest-puppeteer"

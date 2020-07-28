@@ -15,7 +15,8 @@
     "prebuild": "yarn build:client && yarn build:ssr",
     "build": "cross-env NODE_ENV=production yarn workspace build start",
     "start": "yarn build:client && yarn build:ssr && nf start",
-    "start:functional": "cross-env ENV_FILE=testing/.env yarn run prebuild && nf -e testing/.env start"
+    "start:functional": "cross-env ENV_FILE=testing/.env yarn run prebuild && nf -e testing/.env start",
+    "start:staticserver": "cross-env ENV_FILE=testing/.env node server/static.js"
   },
   "private": true,
   "workspaces": [

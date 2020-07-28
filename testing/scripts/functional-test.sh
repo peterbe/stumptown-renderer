@@ -5,6 +5,4 @@ export ENV_FILE=testing/.env
 
 yarn build
 
-yarn workspace testing run test --testPathIgnorePatterns destructive $@
-
-yarn workspace testing run test destructive $@
+yarn workspace testing run test $@

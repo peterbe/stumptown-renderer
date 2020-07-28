@@ -18,13 +18,18 @@ describe("Basic viewing of functional pages", () => {
   });
 
   it("open the /en-US/docs/Web/Foo page", async () => {
-    await page.goto(testURL("/en-US/docs/Web/Foo"), {
+    await page.goto(testURL("/en-US/docs/Web/Foo"));
+    await expect(page).toMatch("<foo>: A test tag");
+  });
+
+  it("open the /en-US/docs/Web/InteractiveExample page", async () => {
+    await page.goto(testURL("/en-US/docs/Web/InteractiveExample"), {
       // Be a bit less patient with this particular page because it contains
       // an iframe, on an external URL,  which we're not particularly
       // interested in waiting for.
       waitUntil: "domcontentloaded",
     });
-    await expect(page).toMatch("<foo>: A test tag");
+    await expect(page).toMatch("I Have an Interactive Example");
   });
 
   it("open the /en-US/docs/Learn/CSS/CSS_layout/Introduction page", async () => {

@@ -19,8 +19,6 @@ test("content built foo page", () => {
   expect(doc.title).toBe("<foo>: A test tag");
   expect(doc.summary).toBe("This is a sample page");
   expect(doc.mdn_url).toBe("/en-US/docs/Web/Foo");
-  // expect(doc.popularity).toBe(0.5);
-  // expect(doc.modified).toBeTruthy();
   expect(doc.source).toBeTruthy();
 
   expect(doc.flaws.macros.length).toBe(6);
@@ -118,12 +116,25 @@ test("content built foo page", () => {
 
   const htmlFile = path.join(builtFolder, "index.html");
   expect(fs.existsSync(htmlFile)).toBeTruthy();
+});
 
-  // XXX this needs to be dealt with.
-  // const html = fs.readFileSync(htmlFile, "utf-8");
-  // const $ = cheerio.load(html);
-  // expect($("p").text()).toMatch(/Below is a sample interactive example/);
-  // expect($("iframe").length).toEqual(1);
+test("content built interactiveexample page", () => {
+  expect(fs.existsSync(buildRoot)).toBeTruthy();
+
+  const builtFolder = path.join(
+    buildRoot,
+    "en-us",
+    "docs",
+    "web",
+    "interactiveexample"
+  );
+  expect(fs.existsSync(builtFolder)).toBeTruthy();
+
+  const htmlFile = path.join(builtFolder, "index.html");
+  const html = fs.readFileSync(htmlFile, "utf-8");
+  const $ = cheerio.load(html);
+  expect($("p").text()).toMatch(/Below is a sample interactive example/);
+  expect($("iframe").length).toEqual(1);
 });
 
 test("the 'notranslate' class is correctly inserted", () => {

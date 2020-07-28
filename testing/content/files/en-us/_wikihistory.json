@@ -57,10 +57,15 @@
   },
   "Web/Foo": {
     "modified": "2019-01-01T01:01:01.550Z",
-    "_generated": "2020-05-26T19:01:02.407Z",
     "contributors": [
       "cmills",
       "wbamberg"
+    ]
+  },
+  "Web/InteractiveExample": {
+    "modified": "2020-07-01T01:01:01.550Z",
+    "contributors": [
+      "peterbe"
     ]
   },
   "Web": {

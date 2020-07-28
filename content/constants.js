@@ -1,12 +1,20 @@
+const fs = require("fs");
 const path = require("path");
 
 require("dotenv").config({
   path: path.join(__dirname, "..", process.env.ENV_FILE || ".env"),
 });
 
-const CONTENT_ROOT = process.env.CONTENT_ROOT
-  ? path.join(__dirname, "..", process.env.CONTENT_ROOT)
-  : path.join(__dirname, "..", "content", "files");
+const CONTENT_ROOT = (() => {
+  const root =
+    process.env.CONTENT_ROOT || path.join(__dirname, "..", "content", "files");
+  // If the CONTENT_ROOT wasn't an absolute (existing) directory, it's
+  // assumed to be relative to the project root.
+  if (!fs.existsSync(root)) {
+    return path.join(__dirname, "..", root);
+  }
+  return root;
+})();
 
 const CONTENT_ARCHIVE_ROOT = process.env.CONTENT_ARCHIVE_ROOT
   ? path.join(__dirname, "..", process.env.CONTENT_ARCHIVE_ROOT)

@@ -159,13 +159,21 @@ console.log(await page.content());
 
 ## Headless tests should only test static server
 
-In CI, the environment variable `SERVER_DISABLE_CATCHALL=true` is set so that
-if a URL to `http://localhost:5000/*` doesn't match a file on disk, it should
-not attempt to build it on-the-fly. That ability to build on-the-fly is
-only for when you run the full development environment.
+To run the functional tests you need a server (on `localhost:5000`) and
+it should just be a static file server. You *can* use `yarn start:functional`
+but that server has many tricks such as building on-the-fly.
 
-**All headless tests should assume all static files from the server.**
+A better server to use is:
 
-That's because our `server` is being used for two difference purposes.
-One, for the local development as a proxy for `http://localhost:3000` and
-one for running functional (headless) tests.
+```sh
+yarn start:staticserver
+```
+
+Now you can run just the functional `jest` tests over and over:
+
+```sh
+export TESTING_START_SERVER=false  # should be false by default anyway
+./testing/scripts/functional-test.sh
+```
+
+If in doubt, look at the file `.github/workflows/testing.yml` and what it does.
