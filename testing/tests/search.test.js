@@ -7,6 +7,16 @@ function testURL(pathname = "/") {
 describe("Site search", () => {
   const SEARCH_SELECTOR = 'form input[type="search"]';
 
+  beforeAll(async () => {
+    // Yes, this is a cheeky implementation testing detail but it's a nice
+    // sanity check that the server can respond with *something* that's
+    // sensible. This "test" also helps make sense of other potentially
+    // very confusing errors within the important tests themselves.
+    await page.goto(testURL("/en-US/search-index.json"));
+    // It's JSON but this asserts that page will be findable
+    await expect(page).toMatch("<foo>: A test tag");
+  });
+
   test("find Foo page", async () => {
     await page.goto(testURL("/"));
     await expect(page).toFill(SEARCH_SELECTOR, "foo");

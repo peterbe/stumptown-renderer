@@ -21,6 +21,11 @@ app.use(express.static(STATIC_ROOT));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Used for headless test sanity checking
+app.get("/_ping", (req, res) => {
+  res.send("pong");
+});
+
 app.use("/_document", documentRouter);
 
 app.get("/_open", (req, res) => {
@@ -120,7 +125,9 @@ app.get("/*", async (req, res) => {
 
   const isJSONRequest = extraSuffix.endsWith(".json");
 
+  console.time(`buildDocumentFromURL(${lookupURL})`);
   const document = await buildDocumentFromURL(lookupURL);
+  console.timeEnd(`buildDocumentFromURL(${lookupURL})`);
   if (!document) {
     // redirect resolving can take some time, so we only do it when there's no document
     // for the current route
