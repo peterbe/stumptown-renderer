@@ -4,12 +4,6 @@ function testURL(pathname = "/") {
   return "http://localhost:5000" + pathname;
 }
 
-beforeAll(async () => {
-  // Make sure we're hitting our server before starting anything fancy
-  await page.goto(testURL("/_ping"));
-  await expect(page).toMatch("pong");
-});
-
 describe("Basic viewing of functional pages", () => {
   it("open the temporary home page", async () => {
     await page.goto(testURL("/"));
