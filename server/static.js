@@ -9,10 +9,6 @@ const { staticMiddlewares } = require("./middlewares");
 const app = express();
 app.use(express.json());
 
-// Lowercase every request because every possible file we might have
-// on disk is always in lowercase.
-// This only helps when you're on a filesystem (e.g. Linux) that is case
-// sensitive.
 app.use(staticMiddlewares);
 
 // TEMPT

@@ -12,12 +12,12 @@ const { STATIC_ROOT } = require("./constants");
 const documentRouter = require("./document");
 const { searchRoute } = require("./document-watch");
 const flawsRoute = require("./flaws");
-const { staticMiddleware } = require("./middlewares");
+const { staticMiddlewares } = require("./middlewares");
 
 const app = express();
 app.use(express.json());
 
-app.use(staticMiddleware);
+app.use(staticMiddlewares);
 
 app.use(express.static(STATIC_ROOT));
 
