@@ -3,15 +3,13 @@
  */
 const fs = require("fs");
 const url = require("url");
-const path = require("path");
+
+const tempy = require("tempy");
 const got = require("got");
 const util = require("./util.js");
 
-const CACHED_WEB_EXT_EXAMPLES_FILEPATH = path.join(
-  __dirname,
-  "__cached-web-ext-examples.json"
-);
-let webExtExamplesCached = null;
+// Module level caching for repeat calls to fetchWebExtExamples()
+let webExtExamples = null;
 
 module.exports = {
   /**
@@ -145,40 +143,24 @@ module.exports = {
   },
 
   async fetchWebExtExamples() {
-    if (!webExtExamplesCached) {
+    if (webExtExamples) {
+      return webExtExamples;
+    }
+    const cacheFilepath = tempy.file({ name: "web-ext-examples.json" });
+    const url =
+      "https://raw.githubusercontent.com/mdn/webextensions-examples/master/examples.json";
+    if (!fs.existsSync(cacheFilepath)) {
       try {
-        webExtExamplesCached = await got(
-          "https://raw.githubusercontent.com/mdn/webextensions-examples/master/examples.json",
-          {
-            timeout: 10000,
-          }
-        ).json();
-        if (process.env.NODE_ENV === "development") {
-          fs.writeFileSync(
-            CACHED_WEB_EXT_EXAMPLES_FILEPATH,
-            JSON.stringify(webExtExamplesCached),
-            "utf-8"
-          );
-        }
-      } catch (e) {
-        if (
-          e instanceof got.RequestError &&
-          process.env.NODE_ENV === "development"
-        ) {
-          // The assumption here is that you may wish to work offline
-          // in development mode, so use the last cached data. If there
-          // is not cached data, it'll throw an error which will generate
-          // a macro flaw.
-          webExtExamplesCached = JSON.parse(
-            fs.readFileSync(CACHED_WEB_EXT_EXAMPLES_FILEPATH, "utf-8")
-          );
-        } else {
-          // This will generate macro flaws for all calls to the WebExtExamples and
-          // WebExtAllExamples macros.
-          throw e;
-        }
+        webExtExamples = await got(url, {
+          timeout: 1000,
+          retry: 5,
+        }).json();
+        fs.writeFileSync(cacheFilepath, JSON.stringify(webExtExamples));
+      } catch (error) {
+        console.error(`Unable to download webextensions example ${url}`, error);
+        throw error;
       }
     }
-    return webExtExamplesCached;
+    return JSON.parse(fs.readFileSync(cacheFilepath));
   },
 };

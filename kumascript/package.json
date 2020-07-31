@@ -14,7 +14,8 @@
     "got": "^11.5.1",
     "mdn-browser-compat-data": "1.0.33",
     "mdn-data": "2.0.11",
-    "sanitize-filename": "^1.6.3"
+    "sanitize-filename": "^1.6.3",
+    "tempy": "0.6.0"
   },
   "devDependencies": {
     "extend": "^3.0.2",
