@@ -1,25 +1,15 @@
 import json
-import sys
 import os
+import sys
 
 from decouple import AutoConfig
 
 config = AutoConfig(os.curdir)
 
-DEFAULT_BUCKET = config("DEPLOYER_BUCKET", "yari")
+CONTENT_ROOT = config("CONTENT_ROOT", default=None)
+CONTENT_TRANSLATED_ROOT = config("CONTENT_TRANSLATED_ROOT", default=None)
 
-DEFAULT_NAME = config("DEPLOYER_NAME", default=None)
-
-DEFAULT_NAME_PATTERN = config(
-    # "DEPLOYER_DEFAULT_NAME_PATTERN", "{username}-{branchname}"
-    "DEPLOYER_NAME_PATTERN",
-    "{branchname}",
-)
-
-AWS_PROFILE = config("AWS_PROFILE", default="default")
-
-# E.g. us-east-1
-S3_DEFAULT_BUCKET_LOCATION = config("S3_BUCKET_LOCATION", default="")
+DEFAULT_BUCKET_NAME = config("DEPLOYER_BUCKET_NAME", default="dev")
 
 # When uploading a bunch of files, the work is done in a thread pool.
 # If you use too many "workers" it might saturate your network meaning it's
@@ -35,9 +25,8 @@ HASHED_CACHE_CONTROL = config(
     "DEPLOYER_HASHED_CACHE_CONTROL", default=60 * 60 * 24 * 365, cast=int
 )
 
-
 DEFAULT_NO_PROGRESSBAR = config(
     "DEPLOYER_NO_PROGRESSBAR",
+    default=not sys.stdout.isatty() or bool(json.loads(os.environ.get("CI", "false"))),
     cast=bool,
-    default=not sys.stdout.isatty() or bool(json.loads(os.environ.get("CI", "0"))),
 )

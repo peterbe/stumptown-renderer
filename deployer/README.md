@@ -1,123 +1,131 @@
-# deployer
+# Deployer
 
-Ship a Yari static site for web hosting.
+The Yari deployer does two things. First, it's used to upload document
+redirects, pre-built document pages, static files (e.g. JS, CSS, and
+image files), and sitemap files into an existing AWS S3 bucket.
+Since we serve MDN from a S3 bucket via a CloudFront CDN, this is the
+way we upload a new version of the site.
 
-## Limitations and caveats
-
-- Redirects - in the build directory we're supposed to have
-  `/en-us/_redirects.txt`
-
-- Without Lambda@Edge in front of the S3 Website some URLs won't map correctly.
-
-- GitHub integration
-
-## How it works
-
-This project's goal is ultimately to take a big directory of files and
-upload them to S3. But there are some more advanced features so as
-turning `_redirects.txt` files into S3 redirect keys. And there might be
-file system names that don't match exactly what we need the S3 key to
-be called exactly.
-
-All deployments, generally, go into the one same S3 bucket. But in that bucket
-you always have a "prefix" (aka. a root folder) which gets used by
-CloudFront so you can have _N_ CloudFront distributions for 1 S3 bucket.
-For example, one prefix might be called `master` which'll be the
-production site. Another prefix might be `peterbe-pr12345`.
-
-It might be worth considering having 2 buckets:
-
-- One for production builds
-
-- One for pull request builds
-
-So every deployment has a prefix (aka. the "name") which can be automatically
-generated based on the name of the current branch, but if it's known
-from the CI environment, even better, then we don't need to ask git.
-The first thing it does is that it downloads a complete listing of
-every known key in the bucket under that prefix and each key's size.
-(That's all you get from `bucket.list_objects_v2`). Now, it starts to
-walk the local directory and for each _file_ it applies the following logic:
-
-- Does it S3 key _not_ exist at all? --> Upload brand new S3 key!
-- Does the S3 key _exist_?
-  - Is the file size different from the S3 key size? --> Upload changed S3 key!
-  - Is the file size exactly the same as the S3 key size? --> Download the
-    S3 key's `Metadata->filehash`.
-    - Is the hash exactly the same as the file's hash? --> Do nothing!
-    - Is the hash different? --> Upload changed S3 key!
-
-When it uploads an S3 key, _always_ compute the local file's hash and
-include that as a piece of S3 key Metadata.
+Second, it is used to update and publish changes to existing AWS Lambda
+functions. For example, we use it to update and publish new versions of
+a Lambda function that we use to transform incoming document URL's into
+their corresponding S3 keys.
 
 ## Getting started
 
-You can install it globally or in a virtualen environment. Whatever floats
-float fancy.
+You can install it globally or in a virtualenv environment. Whichever you
+prefer.
 
-    poetry install
-    poetry run deployer --help
+```sh
+cd deployer
+poetry install
+poetry run deployer --help
+```
 
-Please refer to the [`boto3` documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html#configuration) with regards to configuring AWS access credentials.
+Please refer to the [`boto3` documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html#configuration)
+with regards to configuring AWS access credentials.
 
-### Actually uploading something
+## Uploads
 
-The sub-command for uploading is called `upload`. You use it like this:
+The `poetry run deployer upload` command uploads files as well as redirects
+into an existing S3 bucket. As input, it takes a directory which contains the
+files that should be uploaded, but it also needs to know where to find
+any redirects that should be uploaded. By default it searches for redirects
+within the content directories specified by `--content-root` (or
+`CONTENT_ROOT`) and `--content-translated-root` (or `CONTENT_TRANSLATED_ROOT`).
+It does this by searching for `_redirects.txt` files within those directories,
+converting each line in a `_redirects.txt` file into an AWS S3 redirect key.
+The files and redirects can be uploaded into the S3 bucket's root, or instead
+into a sub-folder of the root (`--folder` option), which is what we do when
+uploading experimental versions of the site.
 
-    poetry run deployer upload --help
+Currently, we have three main S3 buckets that we upload into: `dev` (for
+experimental or possible versions of the site), `stage`, and `prod`.
 
-An example of this is, if you know what you want your bucket to be called
-and you know what the folder prefix should be, and you have built the whole
-site in `../client/build`:
+When uploading files (not redirects), the deployer is intelligent about
+what it uploads. If only uploads files whose content has changed, skipping
+the rest. However, since the `cache-control` attribute of a file is not
+considered part of its content, if you'd like to change the `cache-control`
+from what's in S3, it's important to use the `--force-refresh` option to
+ensure that all files are uploaded with fresh `cache-control` attributes.
 
-    poetry run deployer upload --bucket mdn-yari --name pr1234 ../client/build
+Redirects are always uploaded.
+
+### Examples
+
+```sh
+cd deployer
+poetry run deployer upload --bucket dev --folder pr1234 ../client/build
+```
+
+```sh
+cd deployer
+poetry run deployer upload --bucket prod ../client/build
+```
+
+## Updating Lambda Functions
+
+The command:
+
+```sh
+cd deployer
+poetry run deployer update-lambda-functions
+```
+
+will discover every folder that contains a Lambda function, create a
+deployment package (Zip file) for each one by running:
+
+```sh
+yarn make-package
+```
+
+and if the deployment package is different from what is already in AWS,
+it will upload and publish a new version.
 
 ## Environment variables
 
-All the options you can specify with the CLI can equally be expressed
-as environment variables. You just need to prefix it with `DEPLOYER_` and
-write it all upper case.
+The following environment variables are supported.
 
-    export DEPLOYER_BUCKET=peterbe-yari
-    export DEPLOYER_NAME=master
-    poetry run deployer upload ../client/build
-
-...is the same as...
-
-    poetry run deployer upload --bucket peterbe-yari --name master ../client/build
-
-Other things you can set (excluding AWS credentials for `boto3`):
-
-- `AWS_PROFILE` - default: `default`
-- `S3_BUCKET_LOCATION` - default: `''`
-- `DEPLOYER_MAX_WORKERS_PARALLEL_UPLOADS` - default: `50`
-- `DEPLOYER_CACHE_CONTROL` - default: `60 * 60`
-- `DEPLOYER_HASHED_CACHE_CONTROL` - default: `60 * 60 * 24 * 365`
-- `DEPLOYER_NO_PROGRESSBAR` - default: `false`
-
-## Goal
-
-To be dead-easy to use and powerful at the same time.
+- `DEPLOYER_BUCKET_NAME` is equivalent to using `--bucket`
+- `DEPLOYER_NO_PROGRESSBAR` is equivalent to using `--no-progressbar`
+- `DEPLOYER_CACHE_CONTROL` can be used to specify the `cache-control`
+  header for all non-hashed files that are uploaded (the default is
+  `3600` or one hour)
+- `DEPLOYER_HASHED_CACHE_CONTROL` can be used to specify the `cache-control`
+  header for all hashed files (e.g., `main.3c12da89.chunk.js`) that are
+  uploaded (the default is `31536000` or one year)
+- `DEPLOYER_MAX_WORKERS_PARALLEL_UPLOADS` controls the number of worker
+  threads used when uploading (the default is `50`)
+- `CONTENT_ROOT` is equivalent to using `--content-root`
+- `CONTENT_TRANSLATED_ROOT` is equivalent to using `--content-translated-root`
 
 ## Contributing
 
 You need to have [`poetry` installed on your system](https://python-poetry.org/docs/).
 Now run:
 
-    cd deployer
-    poetry install
+```sh
+cd deployer
+poetry install
+```
 
 That should have installed the CLI:
 
-    poetry run deployer
+```sh
+poetry run deployer
+```
 
 If you wanna make a PR, make sure it's formatted with `black` and
 passes `flake8`.
 
 You can check that all files are `flake8` fine by running:
 
-    flake8 deployer
+```sh
+flake8 deployer
+```
 
 And to check that all files are formatted according to `black` run:
 
-    black --check deployer
+```sh
+black --check deployer
+```
