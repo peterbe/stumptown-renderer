@@ -239,9 +239,7 @@ class BucketManager:
     def iter_redirect_tasks(self, content_roots, for_counting_only=False):
         # Walk the content roots and yield redirect upload tasks.
         for content_root in content_roots:
-            for fp in iterdir(content_root, max_depth=1):
-                if fp.name != "_redirects.txt":
-                    continue
+            for fp in content_root.glob("**/_redirects.txt"):
                 for line_num, line in enumerate(fp.read_text().split("\n"), start=1):
                     line = line.strip()
                     if line and not line.startswith("#"):
