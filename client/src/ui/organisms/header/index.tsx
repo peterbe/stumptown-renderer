@@ -6,6 +6,9 @@ import { Logo } from "../../atoms/logo";
 import MainMenu from "../../molecules/main-menu";
 import { Search } from "../../molecules/search";
 
+import { ReactComponent as MenuOpenIcon } from "@mdn/dinocons/navigation/menu-open.svg";
+import { ReactComponent as MenuCloseIcon } from "@mdn/dinocons/navigation/menu-close.svg";
+
 import "./index.scss";
 
 export function Header() {
@@ -36,7 +39,9 @@ export function Header() {
         aria-haspopup="true"
         aria-label="Show Menu"
         onClick={toggleMainMenu}
-      />
+      >
+        {showMainMenu ? <MenuOpenIcon /> : <MenuCloseIcon />}
+      </button>
       <div className={`page-header-main ${showMainMenu ? "show" : ""}`}>
         <MainMenu />
         <Search

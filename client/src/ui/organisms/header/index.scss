@@ -8,19 +8,19 @@
   right: 0;
   top: $base-spacing;
 
-  &::before {
-    background: transparent url("~@mdn/dinocons/navigation/menu-open.svg") 0 0
-      no-repeat;
-    background-size: 21px;
-    content: "";
-    display: block;
-    height: 21px;
-    width: 21px;
-  }
+  // &::before {
+  //   background: transparent url("~@mdn/dinocons/navigation/menu-open.svg") 0 0
+  //     no-repeat;
+  //   background-size: 21px;
+  //   content: "";
+  //   display: block;
+  //   height: 21px;
+  //   width: 21px;
+  // }
 
-  &.expanded::before {
-    background-image: url("~@mdn/dinocons/navigation/menu-close.svg");
-  }
+  // &.expanded::before {
+  //   background-image: url("~@mdn/dinocons/navigation/menu-close.svg");
+  // }
 
   @media #{$mq-tablet-and-up} {
     display: none;
