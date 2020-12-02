@@ -40,7 +40,7 @@ export function Header() {
         aria-label="Show Menu"
         onClick={toggleMainMenu}
       >
-        {showMainMenu ? <MenuOpenIcon /> : <MenuCloseIcon />}
+        {showMainMenu ? <MenuCloseIcon /> : <MenuOpenIcon />}
       </button>
       <div className={`page-header-main ${showMainMenu ? "show" : ""}`}>
         <MainMenu />
