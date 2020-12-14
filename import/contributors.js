@@ -8,12 +8,12 @@ const chalk = require("chalk");
 const mysql = require("mysql");
 
 const {
-  CONTENT_ROOT,
-  CONTENT_ARCHIVED_ROOT,
-  CONTENT_TRANSLATED_ROOT,
+  // CONTENT_ROOT,
+  // CONTENT_ARCHIVED_ROOT,
+  // CONTENT_TRANSLATED_ROOT,
   VALID_LOCALES,
-  Document,
-  Redirect,
+  // Document,
+  // Redirect,
   resolveFundamental,
 } = require("../content");
 
@@ -216,33 +216,46 @@ async function queryDocumentCount(query, constraintsSQL, queryArgs) {
     LEFT OUTER JOIN wiki_document p ON w.parent_id = p.id
     ${constraintsSQL}
     GROUP BY w.locale
-    ORDER BY count DESC
   `;
   const results = await query(localesSQL, queryArgs);
 
   let totalCount = 0;
-  console.log(`LOCALE\tDOCUMENTS`);
-  let countNonEnUs = 0;
-  let countEnUs = 0;
-  for (const { count, locale } of results) {
-    console.log(`${locale}\t${count.toLocaleString()}`);
+  // console.log(`LOCALE\tDOCUMENTS`);
+  // let countNonEnUs = 0;
+  // let countEnUs = 0;
+  for (const { count } of results) {
+    // console.log(`${locale}\t${count.toLocaleString()}`);
     totalCount += count;
-    if (locale === "en-US") {
-      countEnUs += count;
-    } else {
-      countNonEnUs += count;
-    }
+    // if (locale === "en-US") {
+    //   countEnUs += count;
+    // } else {
+    //   countNonEnUs += count;
+    // }
   }
 
-  if (countNonEnUs && countEnUs) {
-    const nonEnUsPercentage = (100 * countNonEnUs) / (countNonEnUs + countEnUs);
-    console.log(
-      `(FYI ${countNonEnUs.toLocaleString()} (${nonEnUsPercentage.toFixed(
-        1
-      )}%) are non-en-US)`
-    );
-  }
+  // if (countNonEnUs && countEnUs) {
+  //   const nonEnUsPercentage = (100 * countNonEnUs) / (countNonEnUs + countEnUs);
+  //   console.log(
+  //     `(FYI ${countNonEnUs.toLocaleString()} (${nonEnUsPercentage.toFixed(
+  //       1
+  //     )}%) are non-en-US)`
+  //   );
+  // }
 
+  return totalCount;
+}
+
+async function queryRevisionCount(query) {
+  const localesSQL = `
+    SELECT COUNT(*) AS count
+    FROM wiki_revision
+  `;
+  const results = await query(localesSQL, queryArgs);
+
+  let totalCount = 0;
+  for (const { count } of results) {
+    totalCount += count;
+  }
   return totalCount;
 }
 
@@ -312,8 +325,6 @@ async function queryDocuments(pool, options) {
       w.slug,
       w.locale,
       w.is_redirect,
-      w.html,
-      w.rendered_html,
       w.modified,
       p.id AS parent_id,
       p.slug AS parent_slug,
@@ -335,33 +346,100 @@ async function queryDocuments(pool, options) {
   };
 }
 
-async function queryDocumentTags(query, options) {
+async function queryRevisions(pool, options) {
   const { constraintsSQL, queryArgs } = getSQLConstraints(
     {
       alias: "w",
+      parentAlias: "p",
     },
     options
   );
-  const sql = `
+
+  const query = promisify(pool.query).bind(pool);
+
+  await addLocalizedArchiveSlugPrefixes(query, constraintsSQL, queryArgs);
+  await populateRedirectInfo(pool, constraintsSQL, queryArgs);
+  // const totalCount = await queryDocumentCount(query, constraintsSQL, queryArgs);
+  const totalCount = await queryRevisionCount(query);
+
+  const documentsSQL = `
     SELECT
-      w.id,
-      t.name
-    FROM wiki_document w
-    INNER JOIN wiki_taggeddocument wt ON wt.content_object_id = w.id
-    INNER JOIN wiki_documenttag t ON t.id = wt.tag_id
-    ${constraintsSQL}
+      r.document_id,
+      r.creator_id,
+      r.created
+    FROM wiki_revision r
   `;
 
-  console.log("Going to fetch ALL document tags");
-  const results = await query(sql, queryArgs);
-  const tags = {};
-  for (const row of results) {
-    if (!(row.id in tags)) {
-      tags[row.id] = [];
-    }
-    tags[row.id].push(row.name);
+  return {
+    totalCount,
+    stream: pool
+      .query(documentsSQL, queryArgs)
+      .stream({ highWaterMark: MAX_OPEN_FILES })
+      // node MySQL uses custom streams which are not iterable. Piping it through a native stream fixes that
+      .pipe(new stream.PassThrough({ objectMode: true })),
+  };
+}
+
+async function processDocument(
+  doc,
+  { startClean },
+  isArchive = false,
+  localeWikiHistory,
+  { usernames, contributors }
+) {
+  const { slug, locale, title } = doc;
+
+  const docPath = path.join(locale, slug);
+  if (startClean && allBuiltPaths.has(docPath)) {
+    throw new Error(`${docPath} already exists!`);
+  } else {
+    // allBuiltPaths.add(docPath);
   }
-  return tags;
+
+  const meta = {
+    title,
+    slug,
+    locale,
+  };
+  if (doc.parent_slug) {
+    assert(doc.parent_locale === "en-US");
+    if (doc.parent_is_redirect) {
+      const parentUri = makeURL(doc.parent_locale, doc.parent_slug);
+      const finalUri = redirectFinalDestinations.get(parentUri);
+      meta.translation_of = uriToSlug(finalUri);
+
+      // What might have happened is the following timeline...
+      // 1. Some writes an English document at SlugA
+      // 2. Someone translates that SlugA English document into Japanese
+      // 3. Someone decides to move that English document to SlugB, and makes
+      //    SlugA redirect to SlugB.
+      // 4. Someone translates that SlugB English document into Japanese
+      // 5. Now you have 2 Japanese translations. One whose parent is
+      //    SlugA and one whose parent is SlugB. But if you follow the redirects
+      //    for SlugA you end up on SlugB and, voila! you now have 2 Japanese
+      //    documents that claim to be a translation of SlugB.
+      // This code here is why it sets the `.translation_of_original`.
+      // More context on https://github.com/mdn/yari/issues/2034
+      if (doc.parent_slug !== meta.translation_of) {
+        meta.translation_of_original = doc.parent_slug;
+      }
+    } else {
+      meta.translation_of = doc.parent_slug;
+    }
+  }
+
+  const wikiHistory = {
+    modified: doc.modified.toISOString(),
+  };
+
+  const docContributors = (contributors[doc.id] || [])
+    .map((userId) => usernames[userId])
+    .filter((username) => !IGNORABLE_CONTRIBUTORS.has(username));
+  if (docContributors.length) {
+    wikiHistory.contributors = docContributors;
+  }
+
+  localeWikiHistory.set(doc.slug, wikiHistory);
 }
 
 async function withTimer(label, fn) {
@@ -532,7 +610,7 @@ module.exports = async function runContributorsDump(options) {
 
   // let startTime = Date.now();
 
-  // const documents = await queryDocuments(pool, options);
+  const documents = await queryDocuments(pool, options);
 
   // const progressBar = !options.noProgressbar
   //   ? new ProgressBar({
@@ -544,10 +622,10 @@ module.exports = async function runContributorsDump(options) {
   //   progressBar.init(documents.totalCount);
   // }
 
-  // documents.stream.on("error", (error) => {
-  //   console.error("Querying documents failed with", error);
-  //   process.exit(1);
-  // });
+  documents.stream.on("error", (error) => {
+    console.error("Querying documents failed with", error);
+    process.exit(1);
+  });
 
   // let processedDocumentsCount = 0;
   // let pendingDocuments = 0;
@@ -563,94 +641,140 @@ module.exports = async function runContributorsDump(options) {
   // const allWikiHistory = new Map();
   // const archiveWikiHistory = new Map();
 
-  // for await (const row of documents.stream) {
-  //   processedDocumentsCount++;
+  const contributions = [];
 
-  //   while (pendingDocuments > MAX_OPEN_FILES) {
-  //     await new Promise((resolve) => setTimeout(resolve, 500));
-  //   }
+  for await (const row of documents.stream) {
+    processedDocumentsCount++;
 
-  //   pendingDocuments++;
-  //   (async () => {
-  //     const currentDocumentIndex = processedDocumentsCount;
-  //     // Only update (and repaint) every 20th time.
-  //     // Make it much more than every 1 time or else it'll flicker.
-  //     if (progressBar && currentDocumentIndex % 20 == 0) {
-  //       progressBar.update(currentDocumentIndex);
-  //     }
+    while (pendingDocuments > MAX_OPEN_FILES) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
 
-  //     const absoluteUrl = makeURL(row.locale, row.slug);
-  //     const isFundamentalRedirect = resolveFundamental(absoluteUrl).url;
-  //     if (isFundamentalRedirect) {
-  //       fundamentalRedirects++;
-  //       return;
-  //     }
-  //     const isArchive = isArchiveDoc(row);
-  //     if (row.is_redirect) {
-  //       if (isArchive) {
-  //         // This redirect or its parent is a page that will
-  //         // be archived, or eventually arrives at a page that
-  //         // will be archived. So just drop it!
-  //         archivedRedirects++;
-  //         return;
-  //       }
-  //       const redirect = processRedirect(row, absoluteUrl);
-  //       if (!redirect) {
-  //         discardedRedirects++;
-  //         return;
-  //       }
-  //       if (redirect.url) {
-  //         const finalUri = redirectFinalDestinations.get(absoluteUrl);
-  //         if (redirect.url !== finalUri) {
-  //           fastForwardedRedirects++;
-  //         }
-  //         redirects[absoluteUrl] = finalUri;
-  //       }
-  //       if (redirect.status == "mess") {
-  //         messedupRedirects++;
-  //       } else if (redirect.status == "improved") {
-  //         improvedRedirects++;
-  //       }
-  //     } else {
-  //       assert(row.locale);
-  //       if (isArchive) {
-  //         if (!archiveWikiHistory.has(row.locale)) {
-  //           archiveWikiHistory.set(row.locale, new Map());
-  //         }
-  //       } else {
-  //         if (!allWikiHistory.has(row.locale)) {
-  //           allWikiHistory.set(row.locale, new Map());
-  //         }
-  //       }
-  //       await processDocument(
-  //         row,
-  //         options,
-  //         isArchive,
-  //         isArchive
-  //           ? archiveWikiHistory.get(row.locale)
-  //           : allWikiHistory.get(row.locale),
-  //         {
-  //           usernames,
-  //           contributors,
-  //           tags,
-  //         }
-  //       );
-  //     }
-  //   })()
-  //     .catch((err) => {
-  //       console.log("An error occured during processing");
-  //       console.error(err);
-  //       // The slightest unexpected error should stop the importer immediately.
-  //       process.exit(1);
-  //     })
-  //     .then(() => {
-  //       pendingDocuments--;
-  //     });
-  // }
+    pendingDocuments++;
+    (async () => {
+      // const currentDocumentIndex = processedDocumentsCount;
+
+      const absoluteUrl = makeURL(row.locale, row.slug);
+      const isFundamentalRedirect = resolveFundamental(absoluteUrl).url;
+      if (isFundamentalRedirect) {
+        fundamentalRedirects++;
+        return;
+      }
+      const isArchive = isArchiveDoc(row);
+      if (row.is_redirect) {
+        if (isArchive) {
+          // This redirect or its parent is a page that will
+          // be archived, or eventually arrives at a page that
+          // will be archived. So just drop it!
+          archivedRedirects++;
+          return;
+        }
+        const redirect = processRedirect(row, absoluteUrl);
+        if (!redirect) {
+          discardedRedirects++;
+          return;
+        }
+        if (redirect.url) {
+          const finalUri = redirectFinalDestinations.get(absoluteUrl);
+          if (redirect.url !== finalUri) {
+            fastForwardedRedirects++;
+          }
+          redirects[absoluteUrl] = finalUri;
+        }
+        if (redirect.status == "mess") {
+          messedupRedirects++;
+        } else if (redirect.status == "improved") {
+          improvedRedirects++;
+        }
+      } else {
+        assert(row.locale);
+        if (isArchive) {
+          // if (!archiveWikiHistory.has(row.locale)) {
+          //   archiveWikiHistory.set(row.locale, new Map());
+          // }
+        } else {
+          // if (!allWikiHistory.has(row.locale)) {
+          //   allWikiHistory.set(row.locale, new Map());
+          // }
+        }
+        if (!isArchive) {
+          const { slug, locale, title } = row;
+          console.log();
+          // await processDocument(
+          //   row,
+          //   options,
+          //   false,
+          //   allWikiHistory.get(row.locale),
+          //   {
+          //     usernames,
+          //     contributors,
+          //   }
+          // );
+        }
+      }
+    })()
+      .catch((err) => {
+        console.log("An error occured during processing");
+        console.error(err);
+        // The slightest unexpected error should stop the importer immediately.
+        process.exit(1);
+      })
+      .then(() => {
+        pendingDocuments--;
+      });
+  }
 
   // if (!options.noProgressbar) {
   //   progressBar.stop();
   // }
 
   pool.end();
+
+  await saveWikiHistory(allWikiHistory, false);
 };
+
+async function saveWikiHistory(allHistory, isArchive) {
+  /**
+   * The 'allHistory' is an object that looks like this:
+   *
+   * {'en-us': {
+   *   'Games/Foo': {
+   *     modified: '2019-01-21T12:13:14',
+   *     contributors: ['Gregoor', 'peterbe', 'ryan']
+   *   }
+   *  }}
+   *
+   * But, it's a Map!
+   *
+   * Save these so that there's a _wikihistory.json in every locale folder.
+   */
+
+  const rows = [];
+
+  for (const [locale, history] of allHistory) {
+    const root = locale === "en-US" ? CONTENT_ROOT : CONTENT_TRANSLATED_ROOT;
+    const localeFolder = path.join(root, locale.toLowerCase());
+    let extraLocaleFolder = null;
+    if (!isArchive && locale !== "en-US") {
+      extraLocaleFolder = path.join(
+        CONTENT_TRANSLATED_RENDERED_ROOT,
+        locale.toLowerCase()
+      );
+    }
+    const filePath = path.join(localeFolder, "_wikihistory.json");
+    let extraFilePath = null;
+    if (extraLocaleFolder) {
+      extraFilePath = path.join(extraLocaleFolder, "_wikihistory.json");
+    }
+    const obj = Object.create(null);
+    const keys = Array.from(history.keys());
+    keys.sort();
+    for (const key of keys) {
+      obj[key] = history.get(key);
+    }
+    fs.writeFileSync(filePath, JSON.stringify(obj, null, 2));
+    if (extraFilePath) {
+      fs.writeFileSync(extraFilePath, JSON.stringify(obj, null, 2));
+    }
+  }
+}
