@@ -11,6 +11,7 @@ const {
 const { VALID_LOCALES } = require("../content");
 
 const runImporter = require("./import");
+const runContributorsDump = require("./contributors");
 const runMakePopularitiesFile = require("./popularities");
 
 program
@@ -47,6 +48,20 @@ program
     options.dbURL = args.url;
     return runImporter(options).catch((error) => {
       console.error("error while importing documents:", error);
+      process.exit(1);
+    });
+  })
+
+  .command("contributors")
+  .help("Dump all the Wiki contributors to a CSV file")
+  .argument("[URL]", "database url for connecting to MySQL", {
+    validator: program.STRING,
+    default: DATABASE_URL,
+  })
+  .action(({ args, options }) => {
+    options.dbURL = args.url;
+    return runContributorsDump(options).catch((error) => {
+      console.error("error while dumping contributors:", error);
       process.exit(1);
     });
   })
