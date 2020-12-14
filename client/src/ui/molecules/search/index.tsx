@@ -47,7 +47,7 @@ export function Search(props) {
 export function BasicSearchWidget() {
   const locale = useLocale();
   return (
-    <form action={`/${locale}/search`}>
+    <form action={`/${locale}/search`} className="search-form">
       <label htmlFor="main-q" className="visually-hidden">
         Search MDN
       </label>
@@ -59,6 +59,12 @@ export function BasicSearchWidget() {
         placeholder="Search MDN"
         pattern="(.|\s)*\S(.|\s)*"
         required
+      />
+      <input
+        type="submit"
+        className="ghost search-button"
+        value=""
+        aria-label="Search"
       />
     </form>
   );

@@ -25,19 +25,6 @@
     @media #{$mq-large-desktop-and-up} {
       margin: 0;
     }
-
-    &::after {
-      background: $neutral-600 url("~@mdn/dinocons/general/search.svg") 0 0
-        no-repeat;
-      background-size: 24px;
-      content: "";
-      display: inline-block;
-      height: 24px;
-      position: absolute;
-      right: 20px;
-      top: 10px;
-      width: 24px;
-    }
   }
 
   input.search-input-field {

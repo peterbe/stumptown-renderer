@@ -196,6 +196,7 @@ SCL3_REDIRECT_URLS = list(
             url_test("/en-US/learn/css", "/en-US/docs/Learn/CSS"),
             url_test("/en/learn/css", "/en/docs/Learn/CSS"),
             url_test("/en-US/learn/javascript", "/en-US/docs/Learn/JavaScript"),
+            url_test("/en-US/Learn/JavaScript/First_steps", "/en-US/docs/Learn/JavaScript/First_steps"),
             url_test("/en/learn/javascript", "/en/docs/Learn/JavaScript"),
             url_test("/en-US/learn", "/en-US/docs/Learn"),
             url_test("/en/learn", "/en/docs/Learn"),

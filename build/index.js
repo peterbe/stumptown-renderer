@@ -270,6 +270,7 @@ async function buildDocument(document, documentOptions = {}) {
 
   doc.title = metadata.title;
   doc.mdn_url = document.url;
+  doc.locale = metadata.locale;
 
   // Note that 'extractSidebar' will always return a string.
   // And if it finds a sidebar section, it gets removed from '$' too.

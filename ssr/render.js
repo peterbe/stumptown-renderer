@@ -172,7 +172,14 @@ export default function render(
 
     if (doc.other_translations) {
       const allOtherLocales = doc.other_translations.map((t) => t.locale);
-      for (const translation of doc.other_translations) {
+      // Note, we also always include "self" as a locale. That's why we concat
+      // this doc's locale plus doc.other_translations.
+      const thisLocale = {
+        locale: doc.locale,
+        title: doc.title,
+        url: doc.mdn_url,
+      };
+      for (const translation of [...doc.other_translations, thisLocale]) {
         // The locale used in `<link rel="alternate">` needs to be the ISO-639-1
         // code. For example, it's "en", not "en-US". And it's "sv" not "sv-SE".
         // See https://developers.google.com/search/docs/advanced/crawling/localized-versions?hl=en&visit_id=637411409912568511-3980844248&rd=1#language-codes

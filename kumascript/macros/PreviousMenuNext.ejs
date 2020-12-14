@@ -42,11 +42,11 @@ var s_Menu = mdn.localString({
 });
 
 if ($0) {
-    strPrevious = '<li><a class="button" href="/' + lang + '/docs/' + string.replace($0, ' ', '_') + '">' + s_PreviousNext[0] + '</a></li>';
+    strPrevious = '<li><a class="button minimal" href="/' + lang + '/docs/' + string.replace($0, ' ', '_') + '">' + s_PreviousNext[0] + '</a></li>';
 }
 
 if ($1) {
-    strNext = '<li><a class="button" href="/' + lang + '/docs/' + string.replace($1, ' ', '_') + '">' + s_PreviousNext[1] + '</a></li>';
+    strNext = '<li><a class="button minimal" href="/' + lang + '/docs/' + string.replace($1, ' ', '_') + '">' + s_PreviousNext[1] + '</a></li>';
 }
 
 if ($2) {
@@ -57,11 +57,11 @@ if ($2) {
   var finalString = linkText.replace(re,' ');
   
   if($0 && $1) {
-    strMenu = '<li><a class="button" href="/' + lang + '/docs/' + string.replace($2, ' ', '_') + '">' + s_Menu + finalString + '</a></li>';
+    strMenu = '<li><a class="button minimal" href="/' + lang + '/docs/' + string.replace($2, ' ', '_') + '">' + s_Menu + finalString + '</a></li>';
   } else if($0) {
-    strMenu = '<li><a class="button" href="/' + lang + '/docs/' + string.replace($2, ' ', '_') + '">' + s_Menu + finalString + '</a></li>';
+    strMenu = '<li><a class="button minimal" href="/' + lang + '/docs/' + string.replace($2, ' ', '_') + '">' + s_Menu + finalString + '</a></li>';
   } else if($1) {
-    strMenu = '<li><a class="button" href="/' + lang + '/docs/' + string.replace($2, ' ', '_') + '">' + s_Menu + finalString + '</a></li>';
+    strMenu = '<li><a class="button minimal" href="/' + lang + '/docs/' + string.replace($2, ' ', '_') + '">' + s_Menu + finalString + '</a></li>';
   }
 }
 %>

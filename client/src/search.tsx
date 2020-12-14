@@ -267,6 +267,7 @@ function InnerSearchNavigateWidget(props: InnerSearchNavigateWidgetProps) {
   return (
     <form
       action={`/${locale}/search`}
+      className="search-form"
       {...getComboboxProps({
         className: "search-widget",
         id: "nav-main-search",
@@ -304,6 +305,13 @@ function InnerSearchNavigateWidget(props: InnerSearchNavigateWidgetProps) {
             inputRef.current = input;
           },
         })}
+      />
+
+      <input
+        type="submit"
+        className="ghost search-button"
+        value=""
+        aria-label="Search"
       />
 
       <div {...getMenuProps()}>

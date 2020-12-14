@@ -98,16 +98,24 @@ def test_api_basic(base_url, uri, expected_keys):
 
 # Test value tuple is:
 # - Expected locale prefix
+# - "preferredlocale" cookie value
 # - Accept-Language header value
 LOCALE_SELECTORS = {
-    "en-US": ("en-US", "en-US"),
-    "es": ("es", "es"),
-    "de": ("de", "de"),
+    "en-US-1": ("en-US", None, None),
+    "en-US-2": ("en-US", None, "en-US"),
+    "en-US-3": ("en-US", "en-US", None),
+    "en-US-4": ("en-US", "en-US", "fr"),
+    "es-1": ("es", "es", None),
+    "es-2": ("es", "es", "en-US"),
+    "es-3": ("es", None, "es"),
+    "de-1": ("de", "de", None),
+    "de-2": ("de", "de", "en-US"),
+    "de-3": ("de", None, "de"),
 }
 
 
 @pytest.mark.parametrize(
-    "expected,accept", LOCALE_SELECTORS.values(), ids=list(LOCALE_SELECTORS),
+    "expected,cookie,accept", LOCALE_SELECTORS.values(), ids=list(LOCALE_SELECTORS),
 )
 @pytest.mark.parametrize(
     "slug",
@@ -120,18 +128,23 @@ LOCALE_SELECTORS = {
         "/profiles/sheppy",
         "/users/signin",
         "/promote",
+        "/account",
         "/docs/Web/HTML",
         "/docs/Learn/CSS/Styling_text/Fundamentals#Color",
     ],
 )
-def test_locale_selection(base_url, slug, expected, accept):
+def test_locale_selection(base_url, slug, expected, cookie, accept):
     """
-    Ensure that locale selection, which depends on the "Accept-Language"
-    header, works for the provided URL's.
+    Ensure that locale selection, which depends on the "preferredlocale"
+    cookie and the "Accept-Language" header, works for the provided URL's.
     """
     url = base_url + slug
     assert expected, "expected must be set to the expected locale prefix."
-    assert accept, "accept must be set to the Accept-Langauge header value."
-    response = request("get", url, headers={"Accept-Language": accept})
+    request_kwargs = {}
+    if accept:
+        request_kwargs["headers"] = {"Accept-Language": accept}
+    if cookie:
+        request_kwargs["cookies"] = {"preferredlocale": cookie}
+    response = request("get", url, **request_kwargs)
     assert response.status_code == 302
-    assert response.headers["location"].startswith("/{}".format(expected))
+    assert response.headers["location"].startswith("/{}/".format(expected))

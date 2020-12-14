@@ -141,6 +141,11 @@ test("content built foo page", () => {
   expect($('script[src^="https://cdn.speedcurve.com/"]').attr("src")).toContain(
     "012345"
   );
+
+  // Because this en-US page has a French translation
+  expect($('link[rel="alternate"]').length).toBe(2);
+  expect($('link[rel="alternate"][hreflang="en"]').length).toBe(1);
+  expect($('link[rel="alternate"][hreflang="fr"]').length).toBe(1);
 });
 
 test("content built French foo page", () => {
@@ -159,6 +164,13 @@ test("content built French foo page", () => {
   expect(doc.other_translations[0].locale).toBe("en-US");
   expect(doc.other_translations[0].url).toBe("/en-US/docs/Web/Foo");
   expect(doc.other_translations[0].title).toBe("<foo>: A test tag");
+
+  const htmlFile = path.join(builtFolder, "index.html");
+  const html = fs.readFileSync(htmlFile, "utf-8");
+  const $ = cheerio.load(html);
+  expect($('link[rel="alternate"]').length).toBe(2);
+  expect($('link[rel="alternate"][hreflang="en"]').length).toBe(1);
+  expect($('link[rel="alternate"][hreflang="fr"]').length).toBe(1);
 });
 
 test("summary extracted correctly by span class", () => {
