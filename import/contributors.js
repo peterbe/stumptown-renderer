@@ -320,6 +320,10 @@ function startsWithArchivePrefix(uri) {
   );
 }
 
+function isArchiveRedirect(uri) {
+  return redirectsToArchive.has(uri) || startsWithArchivePrefix(uri);
+}
+
 async function populateRedirectInfo(pool, constraintsSQL, queryArgs) {
   // Populates two data structures: "redirectsToArchive", a set of URI's
   // that ultimately redirect to a page that will be archived, as well as
@@ -651,6 +655,7 @@ async function queryDocuments(pool, options) {
       w.slug,
       w.locale,
       w.is_redirect,
+      w.html,
       w.modified,
       p.id AS parent_id,
       p.slug AS parent_slug,
@@ -758,12 +763,12 @@ async function processDocument(
     modified: doc.modified.toISOString(),
   };
 
-  console.log("CONTRIBUTORS:");
-  console.log(contributors);
-  console.log("DOC CONTRIBUTORS:");
-  console.log(contributors[doc.id]);
+  // console.log("CONTRIBUTORS:");
+  // console.log(contributors);
+  // console.log("DOC CONTRIBUTORS:");
+  // console.log(contributors[doc.id]);
 
-  throw new Error("STOP");
+  // throw new Error("STOP");
 
   const docContributors = (contributors[doc.id] || [])
     .map((userId) => usernames[userId])
@@ -930,8 +935,7 @@ module.exports = async function runContributorsDump(options) {
   );
 
   const query = promisify(pool.query).bind(pool);
-  const x = await queryContributors(query, options);
-  console.log(Object.keys(x));
+  const { contributors, usernames } = await queryContributors(query, options);
   // const [{ usernames, contributors }, tags] = await Promise.all([
   //   withTimer("Time to fetch all contributors", () =>
 
@@ -963,13 +967,13 @@ module.exports = async function runContributorsDump(options) {
   let processedDocumentsCount = 0;
   let pendingDocuments = 0;
 
-  // const redirects = {};
-  // let improvedRedirects = 0;
-  // let messedupRedirects = 0;
-  // let discardedRedirects = 0;
-  // let archivedRedirects = 0;
-  // let fundamentalRedirects = 0;
-  // let fastForwardedRedirects = 0;
+  const redirects = {};
+  let improvedRedirects = 0;
+  let messedupRedirects = 0;
+  let discardedRedirects = 0;
+  let archivedRedirects = 0;
+  let fundamentalRedirects = 0;
+  let fastForwardedRedirects = 0;
 
   const allWikiHistory = new Map();
   // const archiveWikiHistory = new Map();
@@ -1059,6 +1063,7 @@ module.exports = async function runContributorsDump(options) {
   // }
 
   pool.end();
+  console.log(allWikiHistory.get("sv-SE"));
 
   await saveWikiHistory(allWikiHistory, false);
 };

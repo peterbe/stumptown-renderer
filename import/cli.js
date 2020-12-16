@@ -11,7 +11,8 @@ const {
 const { VALID_LOCALES } = require("../content");
 
 const runImporter = require("./import");
-const runContributorsDump = require("./contributors");
+// const runContributorsDump = require("./contributors");
+const runContributorsDump = require("./contributors2");
 const runMakePopularitiesFile = require("./popularities");
 
 program
