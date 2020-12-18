@@ -20,11 +20,14 @@ function makeSitemapIndexXML(pathnames) {
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-    "<sitemap>",
     ...pathnames.map((pathname) => {
-      return `<loc>https://developer.mozilla.org${pathname}</loc>`;
+      return (
+        "<sitemap>" +
+        `<loc>https://developer.mozilla.org${pathname}</loc>` +
+        `<lastmod>${new Date().toISOString().split("T")[0]}</lastmod>` +
+        "</sitemap>"
+      );
     }),
-    "</sitemap>",
     "</sitemapindex>",
   ].join("\n");
 }

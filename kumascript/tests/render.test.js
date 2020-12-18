@@ -102,16 +102,17 @@ describe("render() function", () => {
   it.each(syntaxCases)("handles syntax errors: %s", async (fn) => {
     let input = get(fn);
     // null templates since we expect errors before we render any
-    let [result, errors] = await render(input, {}, renderPrerequisiteFromURL, {
-      templates: null,
-    });
-    expect(result).toEqual(input);
-    expect(Array.isArray(errors)).toBe(true);
-    expect(errors.length).toBe(1);
-    expect(errors[0]).toBeInstanceOf(MacroInvocationError);
-    expect(errors[0].name).toBe("MacroInvocationError");
-    expect(errors[0]).toHaveProperty("line");
-    expect(errors[0]).toHaveProperty("column");
+    expect.assertions(4);
+    try {
+      await render(input, {}, renderPrerequisiteFromURL, {
+        templates: null,
+      });
+    } catch (e) {
+      expect(e).toBeInstanceOf(MacroInvocationError);
+      expect(e.name).toBe("MacroInvocationError");
+      expect(e).toHaveProperty("line");
+      expect(e).toHaveProperty("column");
+    }
   });
 
   it("handles undefined templates", async () => {

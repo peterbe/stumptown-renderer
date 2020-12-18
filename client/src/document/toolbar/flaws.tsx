@@ -137,14 +137,15 @@ export function ToggleDocumentFlaws({ doc }: { doc: Doc }) {
     .sort((a, b) => b.count - a.count);
 
   return (
-    <div id={FLAWS_HASH.slice(1)} ref={rootElement}>
+    <div
+      id={FLAWS_HASH.slice(1)}
+      ref={rootElement}
+      className="toggle-show-flaws"
+    >
       {flawsCounts.length > 0 ? (
-        <button type="submit" onClick={toggle}>
-          {show
-            ? "Hide flaws"
-            : `Show flaws (${flawsCounts
-                .map((flaw) => flaw.count)
-                .join(" + ")})`}
+        <button type="button" className="button" onClick={toggle}>
+          {show ? "Hide flaws" : "Show flaws"} (
+          {flawsCounts.reduce((acc, flaw) => flaw.count + acc, 0)})
         </button>
       ) : (
         <p>
@@ -153,17 +154,16 @@ export function ToggleDocumentFlaws({ doc }: { doc: Doc }) {
             🍾
           </span>
         </p>
-      )}
-
+      )}{" "}
       {show ? (
         <Flaws doc={doc} flaws={flawsCounts} />
       ) : (
-        <small>
+        <span>
           {/* a one-liner about all the flaws */}
           {flawsCounts
             .map((flaw) => `${humanizeFlawName(flaw.name)}: ${flaw.count}`)
             .join(" + ")}
-        </small>
+        </span>
       )}
     </div>
   );
@@ -289,6 +289,7 @@ function FixableFlawsAction({ count }: { count: number }) {
       )}
       <button
         type="button"
+        className="button"
         onClick={async () => {
           setFixing((prev) => !prev);
           await fix();
@@ -303,12 +304,12 @@ function FixableFlawsAction({ count }: { count: number }) {
 
 function FixableFlawBadge() {
   return (
-    <small className="macro-fixable" title="This flaw is fixable.">
+    <span className="macro-fixable" title="This flaw is fixable.">
       Fixable{" "}
       <span role="img" aria-label="Thumbs up">
         👍🏼
       </span>
-    </small>
+    </span>
   );
 }
 
@@ -405,13 +406,13 @@ function BrokenLinks({
                 line {flaw.line}:{flaw.column}
               </a>{" "}
               {flaw.fixable && <FixableFlawBadge />}{" "}
-              {opening && opening === key && <small>Opening...</small>}
+              {opening && opening === key && <span>Opening...</span>}
               <br />
               {flaw.suggestion && (
-                <small>
+                <span>
                   <b>Suggestion:</b>
                   <ShowDiff before={flaw.href} after={flaw.suggestion} />
-                </small>
+                </span>
               )}{" "}
             </li>
           );
@@ -616,14 +617,14 @@ function Macros({
                 <code>{flaw.name}</code> from <code>{flaw.macroName}</code> in
                 line {flaw.line}:{flaw.column}
               </a>{" "}
-              {opening && opening === key && <small>Opening...</small>}{" "}
+              {opening && opening === key && <span>Opening...</span>}{" "}
               {inPrerequisiteMacro && (
-                <small
+                <span
                   className="macro-filepath-in-prerequisite"
                   title={`This page depends on a macro expansion inside ${flaw.filepath}`}
                 >
                   In prerequisite macro
-                </small>
+                </span>
               )}{" "}
               {flaw.fixable && <FixableFlawBadge />}{" "}
             </summary>
@@ -631,6 +632,12 @@ function Macros({
               <>
                 <b>Suggestion:</b>
                 <ShowDiff before={flaw.macroSource} after={flaw.suggestion} />
+                <br />
+              </>
+            )}
+            {flaw.explanation && (
+              <>
+                <b>Explanation:</b> <code>{flaw.explanation}</code>
                 <br />
               </>
             )}
@@ -728,12 +735,12 @@ function Images({
               {(flaw.fixable || flaw.externalImage) && <FixableFlawBadge />}{" "}
               <br />
               {flaw.suggestion && (
-                <small>
+                <span>
                   <b>Suggestion:</b>
                   <ShowDiff before={flaw.src} after={flaw.suggestion} />
-                </small>
+                </span>
               )}{" "}
-              <small>{flaw.explanation}</small>
+              <span>{flaw.explanation}</span>
             </li>
           );
         })}

@@ -173,6 +173,26 @@ test("content built French foo page", () => {
   expect($('link[rel="alternate"][hreflang="fr"]').length).toBe(1);
 });
 
+test("wrong xref macro errors", () => {
+  const builtFolder = path.join(
+    buildRoot,
+    "en-us",
+    "docs",
+    "web",
+    "wrong_xref_macro"
+  );
+  const jsonFile = path.join(builtFolder, "index.json");
+  const { doc } = JSON.parse(fs.readFileSync(jsonFile));
+  // Expect the first flaw to be that we're using the wrong xref macro.
+  expect(doc.flaws.macros[0].name).toBe("MacroBrokenLinkError");
+  expect(doc.flaws.macros[0].macroSource).toBe('{{DOMxRef("Promise")}}');
+  expect(doc.flaws.macros[0].line).toBe(7);
+  expect(doc.flaws.macros[0].column).toBe(51);
+  expect(doc.flaws.macros[0].sourceContext).toEqual(
+    expect.stringContaining('Web API: {{DOMxRef("Promise")}}')
+  );
+});
+
 test("summary extracted correctly by span class", () => {
   const builtFolder = path.join(
     buildRoot,

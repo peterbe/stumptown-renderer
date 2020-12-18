@@ -50,6 +50,7 @@ const {
   MacroExecutionError,
   MacroRedirectedLinkError,
   MacroBrokenLinkError,
+  MacroWrongXRefError,
   MacroDeprecatedError,
   MacroPagesError,
 } = require("./errors.js");
@@ -66,17 +67,16 @@ async function render(
   renderPrerequisiteFromURL,
   { templates = null } = {}
 ) {
-  // Parse the source document.
   let tokens;
   try {
     tokens = Parser.parse(source);
   } catch (e) {
     // If there are any parsing errors in the input document
-    // we can't process any of the macros, and just return the
-    // source document unmodified, along with the error.
+    // we can't process any of the macros. Return early with a MacroInvocationError
+    // which contains useful information to the caller.
     // Note that rendering errors in the macros are different;
     // we handle these individually below.
-    return [source, [new MacroInvocationError(e, source)]];
+    throw new MacroInvocationError(e, source);
   }
 
   // The default templates are only overridden during testing.
@@ -118,6 +118,8 @@ async function render(
       args.push(redirectInfo);
     } else if (kind === "bad-pages") {
       NonFatalErrorClass = MacroPagesError;
+    } else if (kind === "wrong-xref-macro") {
+      NonFatalErrorClass = MacroWrongXRefError;
     } else {
       throw Error(`unsupported kind of non-fatal error requested: "${kind}"`);
     }

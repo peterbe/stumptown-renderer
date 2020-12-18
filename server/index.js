@@ -192,34 +192,23 @@ app.get("/*", async (req, res) => {
       clearKumascriptRenderCache: true,
     });
     console.timeEnd(`buildDocumentFromURL(${lookupURL})`);
-    if (!built) {
-      return res
-        .status(404)
-        .sendFile(path.join(STATIC_ROOT, "en-us", "_spas", "404.html"));
+    if (built) {
+      document = built.doc;
+      bcdData = built.bcdData;
     }
-    document = built.doc;
-    bcdData = built.bcdData;
   } catch (error) {
     console.error(`Error in buildDocumentFromURL(${lookupURL})`, error);
     return res.status(500).send(error.toString());
   }
 
   if (!document) {
-    // redirect resolving can take some time, so we only do it when there's no document
-    // for the current route
     const redirectURL = Redirect.resolve(lookupURL);
     if (redirectURL !== lookupURL) {
       return res.redirect(301, redirectURL + extraSuffix);
     }
-
-    // It doesn't resolve to a file on disk and it's not a redirect.
-    // Try to send a slightly better error at least.
     return res
       .status(404)
-      .send(
-        `From URL ${lookupURL} no folder on disk could be found. ` +
-          `Tried to find a folder called ${Document.urlToFolderPath(lookupURL)}`
-      );
+      .sendFile(path.join(STATIC_ROOT, "en-us", "_spas", "404.html"));
   }
 
   if (bcdDataURL) {
@@ -256,7 +245,7 @@ app.listen(PORT, () => {
     console.warn(
       chalk.yellow(
         "Warning! You have not set an EDITOR environment variable. " +
-          'Using the "Edit in your editor" button will probably fail.'
+          'Using the "Open in your editor" button will probably fail.'
       )
     );
   }

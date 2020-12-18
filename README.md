@@ -94,7 +94,7 @@ your preferred editor/IDE. For example, in the root:
 
 Now clicking certain links will open files directly in the currently open
 VSCode IDE. To test it, view any document on `http://localhost:3000` and
-click the "Edit in your editor" button.
+click the "Open in your editor" button.
 
 ### How the server works
 

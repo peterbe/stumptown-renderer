@@ -8,7 +8,9 @@ const { SearchIndex } = require("../build");
 let isReady = false;
 const searchIndex = new SearchIndex();
 
-const webSocketServer = new WebSocket.Server({ port: 8080 });
+const webSocketServer = new WebSocket.Server({
+  port: parseInt(process.env.SERVER_WEBSOCKET_PORT || 8080),
+});
 
 function sendWebSocketMessage(message) {
   for (const client of webSocketServer.clients) {

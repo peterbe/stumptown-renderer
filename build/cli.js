@@ -16,6 +16,7 @@ const { BUILD_OUT_ROOT } = require("./constants");
 const { makeSitemapXML, makeSitemapIndexXML } = require("./sitemaps");
 const { CONTENT_TRANSLATED_ROOT } = require("../content/constants");
 const { uniqifyTranslationsOf } = require("./translationsof");
+const { humanFileSize } = require("./utils");
 
 async function buildDocuments(files = null) {
   // If a list of files was set, it came from the CLI.
@@ -230,15 +231,6 @@ async function buildOtherSPAs() {
 
   // XXX Here, build things like the home page, site-search etc.
   // ...
-}
-
-function humanFileSize(size) {
-  if (size < 1024) return size + " B";
-  let i = Math.floor(Math.log(size) / Math.log(1024));
-  let num = size / Math.pow(1024, i);
-  let round = Math.round(num);
-  num = round < 10 ? num.toFixed(2) : round < 100 ? num.toFixed(1) : round;
-  return `${num} ${"KMGTPEZY"[i - 1]}B`;
 }
 
 function formatTotalFlaws(flawsCountMap, header = "Total_Flaws_Count") {

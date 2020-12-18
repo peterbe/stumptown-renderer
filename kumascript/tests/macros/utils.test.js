@@ -7,22 +7,18 @@ const ERROR_TEST_CASES = [
   {
     title: "with an invalid HTML element",
     html: "<junk></junk>",
-    error: "Element “junk” not allowed",
+    error: "<junk> is not a valid element name",
   },
   {
     title: "with an HTML element missing its closing tag",
     html: "<div>closing tag has gone missing",
-    error: "Unclosed element “div”",
-  },
-  {
-    title: "with an illegal link attribute",
-    html: '<a href="https://example.com" junk="xxx">an example</a>',
-    error: "Attribute “junk” not allowed on element “a” at this point",
+    error:
+      "Missing close-tag, expected '</div>' but document ended before it was found.",
   },
   {
     title: "with an illegal value for a link attribute",
     html: '<a href="https://example.com" dir="xxx">an example</a>',
-    error: "Bad value “xxx” for attribute “dir” on element “a”",
+    error: 'Attribute "dir" has invalid value "xxx"',
   },
 ];
 

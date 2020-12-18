@@ -57,40 +57,34 @@ export function EditActions({ folder }: { folder: string }) {
   return (
     <ul className="edit-actions">
       <li>
-        <a href={`https://developer.mozilla.org/${locale}/docs/${slug}`}>
+        <button
+          type="button"
+          className="button"
+          title={`Folder: ${folder}`}
+          onClick={openInEditorHandler}
+        >
+          Open in your <b>editor</b>
+        </button>
+      </li>
+
+      <li>
+        <a
+          href={`https://developer.mozilla.org/${locale}/docs/${slug}`}
+          className="button"
+        >
           View on MDN
         </a>
       </li>
 
       <li>
-        <Link to={location.pathname.replace("/docs/", "/_edit/")}>
+        <Link
+          to={location.pathname.replace("/docs/", "/_edit/")}
+          className="button"
+        >
           Quick-edit
         </Link>
       </li>
-      <li>
-        <button
-          type="button"
-          title={`Folder: ${folder}`}
-          onClick={openInEditorHandler}
-        >
-          Edit in your <b>editor</b>
-        </button>
-      </li>
-      <li>
-        <Link to={location.pathname.replace("/docs/", "/_manage/")}>
-          Manage document
-        </Link>
-      </li>
-      <li>
-        <Link
-          to={`${location.pathname.replace(
-            "/docs/",
-            "/_create/"
-          )}?initial_slug=${encodeURIComponent(slug)}`}
-        >
-          Create new document
-        </Link>
-      </li>
+
       {editorOpeningError ? (
         <p className="error-message editor-opening-error">
           <b>Error opening page in your editor!</b>

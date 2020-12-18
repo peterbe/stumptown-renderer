@@ -195,7 +195,24 @@ async function buildDocument(document, documentOptions = {}) {
     if (options.clearKumascriptRenderCache) {
       renderKumascriptCache.clear();
     }
-    [renderedHtml, flaws] = await kumascript.render(document.url);
+    try {
+      [renderedHtml, flaws] = await kumascript.render(document.url);
+    } catch (error) {
+      if (error.name === "MacroInvocationError") {
+        // The source HTML couldn't even be parsed! There's no point allowing
+        // anything else move on.
+        // But considering that this might just be one of many documents you're
+        // building, let's at least help by setting a more user-friendly error
+        // message.
+        error.updateFileInfo(document.fileInfo);
+        throw new Error(
+          `MacroInvocationError trying to parse ${error.filepath}, line ${error.line} column ${error.column} (${error.error.message})`
+        );
+      }
+
+      // Any other unexpected error re-thrown.
+      throw error;
+    }
 
     const sampleIds = kumascript.getLiveSampleIDs(
       document.metadata.slug,
@@ -249,7 +266,8 @@ async function buildDocument(document, documentOptions = {}) {
               )
             : null;
           const id = `macro${i}`;
-          return Object.assign({ id, fixable, suggestion }, flaw);
+          const explanation = flaw.error.message;
+          return Object.assign({ id, fixable, suggestion, explanation }, flaw);
         });
       }
     }

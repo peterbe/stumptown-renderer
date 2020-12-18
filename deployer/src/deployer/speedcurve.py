@@ -4,8 +4,12 @@ from requests.packages.urllib3.util.retry import Retry
 
 from .utils import log
 
+POST_URL = "https://api.speedcurve.com/v1/deploys"
 
-def deploy_ping(api_key: str, site_id: str, note: str, detail: str):
+
+def deploy_ping(
+    api_key: str, site_id: str, note: str, detail: str, dry_run: bool = False
+):
     """Based on https://api.speedcurve.com/#add-a-deploy"""
     data = {
         "site_id": site_id,
@@ -15,9 +19,13 @@ def deploy_ping(api_key: str, site_id: str, note: str, detail: str):
     if detail:
         data["detail"] = detail
 
+    if dry_run:
+        log.info(f"Posting {data} to {POST_URL} with API key {api_key[:3] + '...'!r}")
+        return
+
     adapter = HTTPAdapter(
         max_retries=Retry(
-            total=3,
+            backoff_factor=0.3,
             status_forcelist=[429, 500, 502, 503, 504],
             method_whitelist=["POST"],
         )
@@ -25,8 +33,6 @@ def deploy_ping(api_key: str, site_id: str, note: str, detail: str):
     session = requests.Session()
     session.mount("https://", adapter)
     auth = (api_key, "x")
-    response = session.post(
-        "https://api.speedcurve.com/v1/deploys", data=data, auth=auth
-    )
+    response = session.post(POST_URL, data=data, auth=auth)
     response.raise_for_status()
     log.info(response.json())

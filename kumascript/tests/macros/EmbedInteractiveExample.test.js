@@ -28,19 +28,20 @@ ${extraHiddenTag}`
 ${extraHiddenTag}`
     );
   });
-  itMacro("Trailing slash in setting and leading slash in argument", function (
-    macro
-  ) {
-    macro.ctx.env.interactive_examples = {
-      base_url: "https://interactive-examples.mdn.mozilla.net/",
-    };
-    return assert.eventually.equal(
-      macro.call("/pages/css/animation.html"),
-      `<iframe class="interactive" width="100%" height="250" frameborder="0" src="https://interactive-examples.mdn.mozilla.net/pages/css/animation.html" title="MDN Web Docs Interactive Example"></iframe>
+  itMacro(
+    "Trailing slash in setting and leading slash in argument",
+    function (macro) {
+      macro.ctx.env.interactive_examples = {
+        base_url: "https://interactive-examples.mdn.mozilla.net/",
+      };
+      return assert.eventually.equal(
+        macro.call("/pages/css/animation.html"),
+        `<iframe class="interactive" width="100%" height="250" frameborder="0" src="https://interactive-examples.mdn.mozilla.net/pages/css/animation.html" title="MDN Web Docs Interactive Example"></iframe>
 
 ${extraHiddenTag}`
-    );
-  });
+      );
+    }
+  );
   itMacro("Javascript pages get an extra class by default", function (macro) {
     macro.ctx.env.interactive_examples = {
       base_url: "https://interactive-examples.mdn.mozilla.net",

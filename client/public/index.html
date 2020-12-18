@@ -27,10 +27,7 @@
       color="#5bbad5"
     />
     <meta name="theme-color" content="#ffffff" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
+
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>MDN Web Docs</title>
     <meta
@@ -38,6 +35,24 @@
       content="The MDN Web Docs site provides information about Open Web technologies including HTML, CSS, and APIs for both Web sites and progressive web apps."
     />
     <link rel="canonical" href="https://developer.mozilla.org" />
+    <style media="print">
+      .breadcrumbs-locale-container,
+      .document-toc-container,
+      .on-github,
+      nav.sidebar,
+      .page-header-main,
+      .page-footer,
+      ul.prev-next {
+        display: none !important;
+      }
+      .article,
+      .article pre {
+        padding: 2px;
+      }
+      .article pre {
+        border-left-width: 2px;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

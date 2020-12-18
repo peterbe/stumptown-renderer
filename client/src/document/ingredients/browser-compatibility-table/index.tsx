@@ -128,7 +128,7 @@ export default function BrowserCompatibilityTable({
           rel="noopener noreferrer"
           title="Report an issue with this compatibility data"
         >
-          Report problems with this data on GitHub
+          Report problems with this compatibility data on GitHub
         </a>
         <table key="bc-table" className="bc-table bc-table-web">
           <Headers {...{ platforms, browsers }} />

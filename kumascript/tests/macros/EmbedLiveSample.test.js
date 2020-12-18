@@ -167,31 +167,32 @@ describeMacro("EmbedLiveSample", function () {
         "</iframe></td></tr></tbody></table>"
     );
   });
-  itMacro("Four arguments: ID, width, height, XSS attempt (failed)", function (
-    macro
-  ) {
-    macro.ctx.env.url = "/en-US/docs/Web/SVG/Tutorial/Gradients";
-    return assert.eventually.equal(
-      macro.call(
-        "SVGLinearGradient",
-        "120",
-        "240",
-        '"><script>alert("XSS");</script>'
-      ),
-      '<table class="sample-code-table"><thead><tr>' +
-        '<th scope="col" style="text-align: center;">Screenshot</th>' +
-        '<th scope="col" style="text-align: center;">Live sample</th>' +
-        "</tr></thead>" +
-        "<tbody><tr><td>" +
-        '<img alt="" class="internal" src="&#34;&gt;&lt;script&gt;alert(&#34;XSS&#34;);&lt;/script&gt;" />' +
-        "</td><td>" +
-        '<iframe class="live-sample-frame sample-code-frame" ' +
-        'id="frame_SVGLinearGradient" frameborder="0"' +
-        ' width="120" height="240"' +
-        ' src="https://mdn.mozillademos.org/en-US/docs/Web/SVG/Tutorial/Gradients/_samples_/SVGLinearGradient">' +
-        "</iframe></td></tr></tbody></table>"
-    );
-  });
+  itMacro(
+    "Four arguments: ID, width, height, XSS attempt (failed)",
+    function (macro) {
+      macro.ctx.env.url = "/en-US/docs/Web/SVG/Tutorial/Gradients";
+      return assert.eventually.equal(
+        macro.call(
+          "SVGLinearGradient",
+          "120",
+          "240",
+          '"><script>alert("XSS");</script>'
+        ),
+        '<table class="sample-code-table"><thead><tr>' +
+          '<th scope="col" style="text-align: center;">Screenshot</th>' +
+          '<th scope="col" style="text-align: center;">Live sample</th>' +
+          "</tr></thead>" +
+          "<tbody><tr><td>" +
+          '<img alt="" class="internal" src="&#34;&gt;&lt;script&gt;alert(&#34;XSS&#34;);&lt;/script&gt;" />' +
+          "</td><td>" +
+          '<iframe class="live-sample-frame sample-code-frame" ' +
+          'id="frame_SVGLinearGradient" frameborder="0"' +
+          ' width="120" height="240"' +
+          ' src="https://mdn.mozillademos.org/en-US/docs/Web/SVG/Tutorial/Gradients/_samples_/SVGLinearGradient">' +
+          "</iframe></td></tr></tbody></table>"
+      );
+    }
+  );
   const same_slug_iframe =
     '<iframe class="live-sample-frame sample-code-frame"' +
     ' id="frame_Examples" frameborder="0"' +
@@ -238,24 +239,25 @@ describeMacro("EmbedLiveSample", function () {
       );
     }
   );
-  itMacro('Five arguments: ID, "", "", "", XSS Attempt (failed)', function (
-    macro
-  ) {
-    macro.ctx.env.url = "/en-US/docs/Web/Events/focus";
-    return assert.eventually.equal(
-      macro.call(
-        "Event_delegation",
-        "",
-        "",
-        "",
-        '"><script>alert("XSS");</script>'
-      ),
-      '<iframe class="live-sample-frame sample-code-frame"' +
-        ' id="frame_Event_delegation" frameborder="0"' +
-        ' src="https://mdn.mozillademos.org/en-US/docs/%22%3E%3Cscript%3Ealert(%22XSS%22);%3C/script%3E/_samples_/Event_delegation">' +
-        "</iframe>"
-    );
-  });
+  itMacro(
+    'Five arguments: ID, "", "", "", XSS Attempt (failed)',
+    function (macro) {
+      macro.ctx.env.url = "/en-US/docs/Web/Events/focus";
+      return assert.eventually.equal(
+        macro.call(
+          "Event_delegation",
+          "",
+          "",
+          "",
+          '"><script>alert("XSS");</script>'
+        ),
+        '<iframe class="live-sample-frame sample-code-frame"' +
+          ' id="frame_Event_delegation" frameborder="0"' +
+          ' src="https://mdn.mozillademos.org/en-US/docs/%22%3E%3Cscript%3Ealert(%22XSS%22);%3C/script%3E/_samples_/Event_delegation">' +
+          "</iframe>"
+      );
+    }
+  );
   itMacro('Six arguments: ID, width, height, "", "", class', function (macro) {
     macro.ctx.env.url = "/en-US/docs/Web/CSS/-moz-appearance";
     return assert.eventually.equal(
@@ -288,28 +290,29 @@ describeMacro("EmbedLiveSample", function () {
       );
     }
   );
-  itMacro('Seven arguments: ID, width, height, "", "", "", features', function (
-    macro
-  ) {
-    macro.ctx.env.url = "/en-US/docs/Web/API/Media_Streams_API/Constraints";
-    return assert.eventually.equal(
-      macro.call(
-        "Example_Constraint_exerciser",
-        650,
-        800,
-        "",
-        "",
-        "",
-        "video; microphone"
-      ),
-      '<iframe class="live-sample-frame sample-code-frame"' +
-        ' id="frame_Example_Constraint_exerciser" frameborder="0"' +
-        ' width="650" height="800"' +
-        ' src="https://mdn.mozillademos.org/en-US/docs/Web/API/Media_Streams_API/Constraints/_samples_/Example_Constraint_exerciser"' +
-        ' allow="video; microphone">' +
-        "</iframe>"
-    );
-  });
+  itMacro(
+    'Seven arguments: ID, width, height, "", "", "", features',
+    function (macro) {
+      macro.ctx.env.url = "/en-US/docs/Web/API/Media_Streams_API/Constraints";
+      return assert.eventually.equal(
+        macro.call(
+          "Example_Constraint_exerciser",
+          650,
+          800,
+          "",
+          "",
+          "",
+          "video; microphone"
+        ),
+        '<iframe class="live-sample-frame sample-code-frame"' +
+          ' id="frame_Example_Constraint_exerciser" frameborder="0"' +
+          ' width="650" height="800"' +
+          ' src="https://mdn.mozillademos.org/en-US/docs/Web/API/Media_Streams_API/Constraints/_samples_/Example_Constraint_exerciser"' +
+          ' allow="video; microphone">' +
+          "</iframe>"
+      );
+    }
+  );
   itMacro(
     'Seven arguments: ID, width, height, "", "", "", XSS Attempt (failed)',
     function (macro) {

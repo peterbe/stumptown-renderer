@@ -166,4 +166,6 @@ def speedcurve_deploy(ctx, **kwargs):
     note = kwargs["note"]
     detail = kwargs["detail"]
     log.info(f"Speedcurve Deploy note={note!r}, detail={detail!r}")
-    speedcurve_deploy_ping(api_key, site_id, note, detail)
+    speedcurve_deploy_ping(
+        api_key, site_id, note, detail, dry_run=ctx.obj.get("dry_run")
+    )

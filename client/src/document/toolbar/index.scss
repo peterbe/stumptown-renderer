@@ -2,12 +2,25 @@
 @import "~@mdn/minimalist/sass/vars/layout";
 
 .toolbar {
-  padding: 0 $base-spacing;
-  border: 1px solid $red-300;
-}
+  margin: 0 auto;
+  padding: $base-unit;
 
-.toolbar-first-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  // This is the same we use for the `.titlebar-container h1`
+  @media #{$mq-tablet-and-up} {
+    max-width: $max-width-default;
+    padding: $base-unit $base-spacing;
+  }
+
+  .toolbar-first-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    .edit-actions {
+      padding: $base-unit 0;
+      li {
+        margin-left: 0;
+      }
+    }
+  }
 }

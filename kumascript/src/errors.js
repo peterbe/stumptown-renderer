@@ -223,6 +223,13 @@ class MacroBrokenLinkError extends MacroExecutionError {
   }
 }
 
+class MacroWrongXRefError extends MacroBrokenLinkError {
+  constructor(error, source, token) {
+    super(error, source, token);
+    this.name = "MacroWrongXRefError";
+  }
+}
+
 /**
  * A MacroDeprecatedError is a special case of MacroExecutionError.
  */
@@ -274,6 +281,7 @@ module.exports = {
   MacroExecutionError,
   MacroRedirectedLinkError,
   MacroBrokenLinkError,
+  MacroWrongXRefError,
   MacroDeprecatedError,
   MacroLiveSampleError,
   MacroPagesError,

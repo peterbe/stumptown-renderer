@@ -26,7 +26,7 @@ jobs:
         run: echo ${{ steps.git_diff_kumascript.outputs.diff }}
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2.1.3
+        uses: actions/setup-node@v2.1.4
         with:
           node-version: "12"
       - name: Display Node & Yarn version
@@ -50,8 +50,11 @@ jobs:
           ./testing/scripts/yarn-install.sh
           ./testing/scripts/yarn-lockfile-check.sh
 
-      - name: Lint checking
-        run: ./testing/scripts/lint-check.sh
+      - name: Lint prettier
+        run: yarn prettier-check
+
+      - name: Lint ESLint
+        run: yarn eslint
 
       - name: Unit testing build
         run: yarn test:build
@@ -152,7 +155,7 @@ jobs:
 
       - name: Setup Node.js environment
         if: env.GIT_DIFF
-        uses: actions/setup-node@v2.1.3
+        uses: actions/setup-node@v2.1.4
         with:
           node-version: "12"
 

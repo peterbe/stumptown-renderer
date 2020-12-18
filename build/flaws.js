@@ -3,6 +3,11 @@ const path = require("path");
 
 const chalk = require("chalk");
 const got = require("got");
+const imagemin = require("imagemin");
+const imageminPngquant = require("imagemin-pngquant");
+const imageminMozjpeg = require("imagemin-mozjpeg");
+const imageminGifsicle = require("imagemin-gifsicle");
+const imageminSvgo = require("imagemin-svgo");
 
 const { Document, Redirect } = require("../content");
 const { FLAW_LEVELS } = require("./constants");
@@ -11,6 +16,7 @@ const {
   findMatchesInText,
   replaceMatchesInText,
 } = require("./matches-in-text");
+const { humanFileSize } = require("./utils");
 
 function injectFlaws(doc, $, options, { rawContent }) {
   if (doc.isArchive) return;
@@ -431,7 +437,22 @@ async function fixFixableFlaws(doc, options, document) {
             .replace(/\s+/g, "_")
             .toLowerCase()
         );
-        fs.writeFileSync(destination, imageBuffer);
+        // Before writing to disk, run it through the same imagemin
+        // compression we do in the filecheck CLI.
+        const compressedImageBuffer = await imagemin.buffer(imageBuffer, {
+          plugins: [getImageminPlugin(url.pathname)],
+        });
+        if (compressedImageBuffer.length < imageBuffer.length) {
+          console.log(
+            `Raw image size: ${humanFileSize(
+              imageBuffer.length
+            )} Compressed: ${humanFileSize(compressedImageBuffer.length)}`
+          );
+          fs.writeFileSync(destination, compressedImageBuffer);
+        } else {
+          console.log(`Raw image size: ${humanFileSize(imageBuffer.length)}`);
+          fs.writeFileSync(destination, imageBuffer);
+        }
         console.log(`Downloaded ${flaw.src} to ${destination}`);
         newSrc = path.basename(destination);
       } catch (error) {
@@ -483,6 +504,23 @@ async function fixFixableFlaws(doc, options, document) {
       }
     }
   }
+}
+
+function getImageminPlugin(fileName) {
+  const extension = path.extname(fileName);
+  if (extension === ".jpg" || extension === ".jpeg") {
+    return imageminMozjpeg();
+  }
+  if (extension === ".png") {
+    return imageminPngquant();
+  }
+  if (extension === ".gif") {
+    return imageminGifsicle();
+  }
+  if (extension === ".svg") {
+    return imageminSvgo();
+  }
+  throw new Error(`No imagemin plugin for ${extension}`);
 }
 
 module.exports = { injectFlaws, injectSectionFlaws, fixFixableFlaws };

@@ -819,6 +819,11 @@
     "url": "https://w3c.github.io/FileAPI/",
     "status": "WD"
   },
+  "File System Access API": {
+    "name": "File System Access API",
+    "url": "https://wicg.github.io/file-system-access/",
+    "status": "WD"
+  },
   "File System API": {
     "name": "File and Directory Entries API",
     "url": "https://wicg.github.io/entries-api/",
@@ -1619,6 +1624,11 @@
     "url": "https://www.khronos.org/registry/webgl/extensions/EXT_texture_filter_anisotropic/",
     "status": "REC"
   },
+  "EXT_texture_norm16": {
+    "name": "EXT_texture_norm16",
+    "url": "https://www.khronos.org/registry/webgl/extensions/EXT_texture_norm16/",
+    "status": "REC"
+  },
   "KHR_parallel_shader_compile": {
     "name": "KHR_parallel_shader_compile",
     "url": "https://www.khronos.org/registry/webgl/extensions/KHR_parallel_shader_compile/",
@@ -1732,6 +1742,11 @@
   "WEBGL_lose_context": {
     "name": "WEBGL_lose_context",
     "url": "https://www.khronos.org/registry/webgl/extensions/WEBGL_lose_context/",
+    "status": "REC"
+  },
+  "WEBGL_multi_draw": {
+    "name": "WEBGL_multi_draw",
+    "url": "https://www.khronos.org/registry/webgl/extensions/WEBGL_multi_draw/",
     "status": "REC"
   },
   "WebIDL": {

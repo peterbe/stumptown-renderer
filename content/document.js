@@ -179,6 +179,11 @@ const read = memoize((folder) => {
   if (filePath.includes(" ")) {
     throw new Error("Folder contains whitespace which is not allowed.");
   }
+  if (filePath.includes("\u200b")) {
+    throw new Error(
+      `Folder contains zero width whitespace which is not allowed (${filePath})`
+    );
+  }
   const isTranslated =
     CONTENT_TRANSLATED_ROOT && filePath.startsWith(CONTENT_TRANSLATED_ROOT);
   const isArchive =

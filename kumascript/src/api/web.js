@@ -33,14 +33,24 @@ module.exports = {
     const hrefhash = new URL(href, DUMMY_BASE_URL).hash;
     if (page.url) {
       if (hrefpath.toLowerCase() !== page.url.toLowerCase()) {
-        flaw = this.env.recordNonFatalError(
-          "redirected-link",
-          `${hrefpath} redirects to ${page.url}`,
-          {
-            current: subpath,
-            suggested: page.url.replace(basepath, ""),
-          }
-        );
+        if (page.url.startsWith(basepath)) {
+          flaw = this.env.recordNonFatalError(
+            "redirected-link",
+            `${hrefpath} redirects to ${page.url}`,
+            {
+              current: subpath,
+              suggested: page.url.replace(basepath, ""),
+            }
+          );
+        } else {
+          flaw = this.env.recordNonFatalError(
+            "wrong-xref-macro",
+            "wrong xref macro used (consider changing which macro you use)",
+            {
+              current: subpath,
+            }
+          );
+        }
         flawAttribute = ` data-flaw-src="${util.htmlEscape(flaw.macroSource)}"`;
       }
       const titleAttribute = title ? ` title="${title}"` : "";

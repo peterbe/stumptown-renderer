@@ -106,18 +106,22 @@ export function App(appProps) {
                   }
                 />
                 <Route
-                  path="/_create/*"
-                  element={
-                    <StandardLayout>
-                      <DocumentCreate />
-                    </StandardLayout>
-                  }
-                />
-                <Route
                   path="/_edit/*"
                   element={
                     <StandardLayout>
                       <DocumentEdit />
+                    </StandardLayout>
+                  }
+                />
+
+                {/* The following two are not "enabled". I.e. no link to them.
+                    See https://github.com/mdn/yari/issues/1614
+                 */}
+                <Route
+                  path="/_create/*"
+                  element={
+                    <StandardLayout>
+                      <DocumentCreate />
                     </StandardLayout>
                   }
                 />
@@ -129,6 +133,7 @@ export function App(appProps) {
                     </StandardLayout>
                   }
                 />
+
                 {/*
                 This route exclusively exists for development on the <PageNotFound>
                 component itself.

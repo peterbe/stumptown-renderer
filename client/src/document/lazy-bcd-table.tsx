@@ -77,7 +77,12 @@ function LazyBrowserCompatibilityTableInner({
   if (!data.data) {
     return (
       <p>
-        No compatibility data found for <code>{query}</code>. Check the spelling or contribute data to <a href="https://github.com/mdn/browser-compat-data">mdn/browser-compat-data</a>.
+        No compatibility data found for <code>{query}</code>. Check the spelling
+        or contribute data to{" "}
+        <a href="https://github.com/mdn/browser-compat-data">
+          mdn/browser-compat-data
+        </a>
+        .
       </p>
     );
   }

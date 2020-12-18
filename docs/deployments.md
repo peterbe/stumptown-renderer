@@ -57,17 +57,9 @@ Kuma to render what can't be rendered as a static asset.
 
 ## Tracking Whatsdeployed
 
-### Prod
-
-- [Code](INSERT-URL-WHEN-WE-HAVE-IT)
-- [Content](INSERT-URL-WHEN-WE-HAVE-IT)
-
-### Stage
-
-- [Code](INSERT-URL-WHEN-WE-HAVE-IT)
-- [Content](INSERT-URL-WHEN-WE-HAVE-IT)
-
-### Dev (`main`)
+These URLs give you a comparison between what's the `master` (for Yari)
+and `main` (for Content) in the git repo, compared to what's made it into
+each deployment environment. This helps to answer "Has my change gone live yet?"
 
 - [Code](https://whatsdeployed.io/s/Rzl/mdn/yari)
 - [Content](https://whatsdeployed.io/s/DLi/mdn/content)

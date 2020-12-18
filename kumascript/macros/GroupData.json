@@ -27,8 +27,8 @@
       "properties": ["Navigator.battery"],
       "events": []
     },
-    "Barcode Detector API": {
-      "overview": ["Barcode Detector API"],
+    "Barcode Detection API": {
+      "overview": ["Barcode Detection API"],
       "guides": [],
       "interfaces": ["BarcodeDetector"],
       "methods": [
@@ -449,6 +449,24 @@
         "Blob"
       ],
       "methods": [],
+      "properties": [],
+      "events": []
+    },
+    "File System Access API": {
+      "overview": ["File System Access API"],
+      "guides": [],
+      "interfaces": [
+        "FileSystemHandle",
+        "FileSystemFileHandle",
+        "FileSystemDirectoryHandle",
+        "FileSystemWritableFileStream"
+      ],
+      "methods": [
+        "window.showOpenFilePicker()",
+        "window.showSaveFilePicker()",
+        "window.showDirectoryPicker()",
+        "DataTransferItem.getAsFileSystemHandle()"
+      ],
       "properties": [],
       "events": []
     },

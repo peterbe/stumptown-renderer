@@ -196,10 +196,17 @@ SCL3_REDIRECT_URLS = list(
             url_test("/en-US/learn/css", "/en-US/docs/Learn/CSS"),
             url_test("/en/learn/css", "/en/docs/Learn/CSS"),
             url_test("/en-US/learn/javascript", "/en-US/docs/Learn/JavaScript"),
-            url_test("/en-US/Learn/JavaScript/First_steps", "/en-US/docs/Learn/JavaScript/First_steps"),
+            url_test(
+                "/en-US/Learn/JavaScript/First_steps",
+                "/en-US/docs/Learn/JavaScript/First_steps",
+            ),
             url_test("/en/learn/javascript", "/en/docs/Learn/JavaScript"),
             url_test("/en-US/learn", "/en-US/docs/Learn"),
             url_test("/en/learn", "/en/docs/Learn"),
+            url_test("/de/learn", "/de/docs/Learn"),
+            url_test("/de/learn/", "/de/docs/Learn/"),
+            url_test("/learn", "/docs/Learn"),
+            url_test("/learn/", "/docs/Learn/"),
             url_test(
                 "/en-US/demos/detail/bananabread",
                 "https://github.com/kripken/BananaBread/",
@@ -656,7 +663,10 @@ zone_redirects = (
     ("Apps", "Web/Apps", ("en-US", "fa", "fr", "ja", "th", "zh-CN", "zh-TW", None),),
     ("Apps", "Web/Aplicaciones", ("es",)),
     ("Apps", "Apps", ("bn", "de", "it", "ko", "pt-BR", "ru")),
-    ("Learn", "Learn", ("ca", "de", None)),
+    # The "Learn" zone is actually captured by a regular expression
+    # in the SCL3_REDIRECT_PATTERNS, so there's no need to test it
+    # as part of the zone redirects.
+    # ("Learn", "Learn", ("ca", "de", None)),
     ("Apprendre", "Apprendre", ("fr",)),
     (
         "Marketplace",
@@ -668,13 +678,11 @@ zone_redirects = (
 
 zone_url_test_kwargs = {
     "resp_headers": {"cache-control": "max-age=2592000,public"},
+    "status_code": 302,
 }
 
 ZONE_REDIRECT_URLS = []
 for zone_root, wiki_slug, locales in zone_redirects:
-    # The "Learn" zone is actually captured by a regular expression
-    # in the SCL3_REDIRECT_PATTERNS, which redirect permanently.
-    zone_url_test_kwargs.update(status_code=301 if zone_root == "Learn" else 302)
     for locale in locales:
         prefix = ("/" + locale) if locale else ""
         redirect_path = prefix + "/docs/" + wiki_slug

@@ -94,7 +94,7 @@ jobs:
           path: mdn/translated-content
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2.1.3
+        uses: actions/setup-node@v2.1.4
         with:
           node-version: "12"
 
@@ -190,6 +190,10 @@ jobs:
           du -sh client/build
 
       - name: Deploy with deployer
+        env:
+          GITHUB_SHA: ${{ env.GITHUB_SHA }}
+          GITHUB_RUN_ID: ${{ env.GITHUB_RUN_ID }}
+          GITHUB_ACTION: ${{ env.GITHUB_ACTION }}
         run: |
           # Set the CONTENT_ROOT first
           export CONTENT_ROOT=$(pwd)/mdn/content/files
@@ -236,8 +240,8 @@ jobs:
           # Based on https://api.speedcurve.com/#get-all-sites using the API key
           export SPEEDCURVE_DEPLOY_SITE_ID=85742
           poetry run deployer speedcurve-deploy \
-            --note "${{ env.GITHUB_SHA }}"\
-            --detail "run_id=${{ env.GITHUB_RUN_ID }} action=${{ env.GITHUB_ACTION }}"
+            --note "${GITHUB_SHA}" \
+            --detail "run_id=${GITHUB_RUN_ID} action=${GITHUB_ACTION}"
 
           # TODO
           # Execute command to publish built content to Elasticsearch

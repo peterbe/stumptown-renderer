@@ -150,49 +150,50 @@ describeMacro("jsxref", function () {
     );
   });
 
-  itMacro("Three arguments (slug, name, anchor without hash) [ru]", function (
-    macro
-  ) {
-    // When the # is omitted in the anchor, it is automatically added
-    // Used on:
-    // https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Array/prototype
-    // {{jsxref("Global_Objects/Array", "Array", "массива")}}
-    var name = "Array",
-      partial_slug = "Global_Objects/Array",
-      anchor = "массива",
-      js_ref_ru_url = "/ru/docs/" + js_ref_slug,
-      ref_url = js_ref_ru_url + partial_slug,
-      glob_url = js_ref_ru_url + "Global_Objects/" + partial_slug,
-      expected =
-        '<a href="' +
-        glob_url +
-        "#" +
-        "%D0%BC%D0%B0%D1%81%D1%81%D0%B8%D0%B2%D0%B0" +
-        '">' +
-        "<code>" +
-        name +
-        "</code></a>";
+  itMacro(
+    "Three arguments (slug, name, anchor without hash) [ru]",
+    function (macro) {
+      // When the # is omitted in the anchor, it is automatically added
+      // Used on:
+      // https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Array/prototype
+      // {{jsxref("Global_Objects/Array", "Array", "массива")}}
+      var name = "Array",
+        partial_slug = "Global_Objects/Array",
+        anchor = "массива",
+        js_ref_ru_url = "/ru/docs/" + js_ref_slug,
+        ref_url = js_ref_ru_url + partial_slug,
+        glob_url = js_ref_ru_url + "Global_Objects/" + partial_slug,
+        expected =
+          '<a href="' +
+          glob_url +
+          "#" +
+          "%D0%BC%D0%B0%D1%81%D1%81%D0%B8%D0%B2%D0%B0" +
+          '">' +
+          "<code>" +
+          name +
+          "</code></a>";
 
-    macro.ctx.env.locale = "ru";
+      macro.ctx.env.locale = "ru";
 
-    macro.ctx.info.getPageByURL = jest.fn((url) => {
-      url = getPathname(url);
-      if (url === glob_url) {
-        return {
-          url: glob_url,
-          slug: js_ref_slug + partial_slug,
-        };
-      } else if (url === ref_url) {
-        return {};
-      }
-    });
-    macro.ctx.info.getPathname = getPathname;
+      macro.ctx.info.getPageByURL = jest.fn((url) => {
+        url = getPathname(url);
+        if (url === glob_url) {
+          return {
+            url: glob_url,
+            slug: js_ref_slug + partial_slug,
+          };
+        } else if (url === ref_url) {
+          return {};
+        }
+      });
+      macro.ctx.info.getPathname = getPathname;
 
-    return assert.eventually.equal(
-      macro.call(partial_slug, name, anchor),
-      expected
-    );
-  });
+      return assert.eventually.equal(
+        macro.call(partial_slug, name, anchor),
+        expected
+      );
+    }
+  );
 
   itMacro(
     "Four arguments (slug, name, empty anchor, omit code wrap)",

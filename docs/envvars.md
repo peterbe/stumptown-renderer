@@ -188,6 +188,12 @@ line of defense" for dev/stage URLs that are public.
 Usually the `server` module is started with `foreman` (the `nf` command)
 and this is the default port.
 
+### `SERVER_WEBSOCKET_PORT`
+
+**Default: `8080`**
+
+This is the port for the WebSocket server, which is started when you run `yarn start`.
+
 ### `SERVER_STATIC_ROOT`
 
 **Default `../client/build`**

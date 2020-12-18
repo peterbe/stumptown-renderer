@@ -1,5 +1,15 @@
+.toggle-show-flaws {
+  button.button {
+    display: inline-block;
+  }
+}
+
 #document-flaws {
   margin: 20px;
+
+  button.toggle-show-flaws {
+    display: inline;
+  }
 
   details {
     margin-bottom: 20px;
