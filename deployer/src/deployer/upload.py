@@ -201,6 +201,8 @@ class UploadFileTask(UploadTask):
         return f"max-age={cache_control_seconds}, public"
 
     def upload(self, bucket_manager):
+        # print("WOULD UPLOAD FILE", self.file_path, "->", self.key)
+        print("UPLOAD FILE", self.file_path, "->", self.key)
         bucket_manager.client.upload_file(
             str(self.file_path),
             bucket_manager.bucket_name,
@@ -235,14 +237,16 @@ class UploadRedirectTask(UploadTask):
         return f"max-age={HASHED_CACHE_CONTROL}, public"
 
     def upload(self, bucket_manager):
-        bucket_manager.client.put_object(
-            Body=b"",
-            Key=self.key,
-            ACL="public-read",
-            CacheControl=self.cache_control,
-            WebsiteRedirectLocation=self.to_key,
-            Bucket=bucket_manager.bucket_name,
-        )
+        pass
+        # print("PUT OBJECT (REDIRECT)", self.key)
+        # bucket_manager.client.put_object(
+        #     Body=b"",
+        #     Key=self.key,
+        #     ACL="public-read",
+        #     CacheControl=self.cache_control,
+        #     WebsiteRedirectLocation=self.to_key,
+        #     Bucket=bucket_manager.bucket_name,
+        # )
 
 
 class BucketManager:
@@ -376,11 +380,12 @@ class BucketManager:
             # Upload the redirects first, then the built files. This
             # ensures that a built file overrides its stale redirect.
             for task_iter in (
-                lambda: self.iter_redirect_tasks(content_roots),
+                # lambda: self.iter_redirect_tasks(content_roots),
                 lambda: self.iter_file_tasks(build_directory),
             ):
                 futures = {}
                 for task in task_iter():
+                    print("CONSIDER TASK", repr(task))
                     # Note: redirect upload tasks are never skipped.
                     if existing_bucket_objects and not task.is_redirect:
                         s3_obj = existing_bucket_objects.get(task.key)
