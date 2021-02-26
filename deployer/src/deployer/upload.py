@@ -374,6 +374,17 @@ class BucketManager:
         existing_bucket_objects=None,
         on_task_complete=None,
     ):
+        print("_BUILD_DIRECTORY:", repr(build_directory))
+
+        def list_dir_files(d):
+            for thing in d.iterdir():
+                if thing.is_dir():
+                    list_dir_files(thing)
+                else:
+                    print("\tthing:", thing)
+
+        assert build_directory.exists(), build_directory
+        list_dir_files(build_directory)
         with concurrent.futures.ThreadPoolExecutor(
             max_workers=MAX_WORKERS_PARALLEL_UPLOADS
         ) as executor, StopWatch() as timer:
