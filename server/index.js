@@ -22,7 +22,11 @@ const {
   CONTENT_TRANSLATED_ROOT,
 } = require("../content");
 // eslint-disable-next-line node/no-missing-require
-const { prepareDoc, renderDocHTML } = require("../ssr/dist/main");
+const {
+  prepareDoc,
+  renderDocHTML,
+  renderPDFStream,
+} = require("../ssr/dist/main");
 const { CSP_VALUE_DEV, DEFAULT_LOCALE } = require("../libs/constants");
 
 const { STATIC_ROOT, PROXY_HOSTNAME, FAKE_V1_API } = require("./constants");
@@ -244,9 +248,13 @@ app.get("/*", async (req, res) => {
   } else if (bcdDataURLRegex.test(req.path)) {
     bcdDataURL = req.path;
     lookupURL = lookupURL.replace(bcdDataURLRegex, "");
+  } else if (req.path.endsWith(".pdf")) {
+    extraSuffix = ".pdf";
+    lookupURL = lookupURL.replace(/\.pdf$/, "");
   }
 
   const isJSONRequest = extraSuffix.endsWith(".json");
+  const isPDFRequest = extraSuffix.endsWith(".pdf");
 
   let document;
   let bcdData;
@@ -295,6 +303,13 @@ app.get("/*", async (req, res) => {
   prepareDoc(document);
   if (isJSONRequest) {
     res.json({ doc: document });
+  } else if (isPDFRequest) {
+    // const pdfStream = await ReactPDF.renderToStream(<MyDocument />);
+    const pdfStream = await renderPDFStream(lookupURL, { doc: document });
+    console.log({ pdfStream });
+    res.setHeader("Content-Type", "application/pdf");
+    pdfStream.pipe(res);
+    // pdfStream.on("end", () => console.log("Done streaming, response sent."));
   } else {
     res.header("Content-Security-Policy", CSP_VALUE_DEV);
     res.send(renderDocHTML(document, lookupURL));

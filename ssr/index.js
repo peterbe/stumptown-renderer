@@ -2,8 +2,10 @@ import path from "path";
 
 import React from "react";
 import { StaticRouter } from "react-router-dom/server";
+import ReactPDF from "@react-pdf/renderer";
 
 import { App } from "../client/src/app";
+import { MyDocument } from "../client/src/document/pdf";
 import render from "./render";
 
 // This is necessary because the ssr.js is in dist/ssr.js
@@ -97,4 +99,13 @@ export function renderHTML(url, context) {
     ),
     context
   );
+}
+
+export function renderPDFFile(url, context) {
+  const app = React.createElement(MyDocument, { url, ...context });
+  ReactPDF.render(app, "/tmp/example.pdf");
+}
+export function renderPDFStream(url, context) {
+  const app = React.createElement(MyDocument, { url, ...context });
+  return ReactPDF.renderToStream(app);
 }
